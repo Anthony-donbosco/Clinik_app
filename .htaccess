@@ -1,0 +1,13 @@
+﻿# Clinik_app - .htaccess raiz
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /clinik_app/
+
+    # Evitar loop: si ya estamos en public/, no redirigir
+    RewriteCond %{REQUEST_URI} !^/clinik_app/public/
+
+    # Redirigir todo a public/ CONSERVANDO la ruta del archivo ($1)
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
