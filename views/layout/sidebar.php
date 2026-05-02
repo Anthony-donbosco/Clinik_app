@@ -29,9 +29,9 @@ $menus = [
         ['icon' => '👤', 'label' => 'Mi Perfil',     'href' => '/paciente/perfil'],
     ],
     4 => [ // Admin
-        ['icon' => '🏠', 'label' => 'Panel Admin',   'href' => '/admin'],
+        ['icon' => '🏠', 'label' => 'Panel Admin',    'href' => '/admin'],
         ['icon' => '➕', 'label' => 'Crear Usuario',  'href' => '/admin/crear-usuario'],
-        ['icon' => '📅', 'label' => 'Citas',          'href' => '/citas'],
+        ['icon' => '📅', 'label' => 'Supervisar Citas', 'href' => '/admin/citas'],
     ],
 ];
 
@@ -61,10 +61,24 @@ $currentPath = '/' . ltrim($currentPath, '/');
     <div class="sidebar-nav">
         <p class="nav-section-title">Menú</p>
 
+        <?php
+        // Encontrar la mejor coincidencia (la más larga) para el path actual
+        $bestMatchLength = 0;
+        $activeHref = '';
+        foreach ($currentMenu as $item) {
+            $href = $item['href'];
+            if ($currentPath === $href || str_starts_with($currentPath, rtrim($href, '/') . '/')) {
+                if (strlen($href) > $bestMatchLength) {
+                    $bestMatchLength = strlen($href);
+                    $activeHref = $href;
+                }
+            }
+        }
+        ?>
+
         <?php foreach ($currentMenu as $item): ?>
             <?php
-            $isActive = ($currentPath === $item['href'])
-                     || str_starts_with($currentPath, rtrim($item['href'], '/') . '/');
+            $isActive = ($item['href'] === $activeHref);
             $navId = 'nav-' . strtolower(str_replace(['/', ' '], '-', ltrim($item['href'], '/')));
             ?>
             <a href="<?= $bp . $item['href'] ?>"

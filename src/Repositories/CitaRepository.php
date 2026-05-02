@@ -89,7 +89,7 @@ class CitaRepository
                 INNER JOIN paciente p ON c.id_paciente = p.id_paciente
                 INNER JOIN estado   e ON c.id_estado   = e.id_estado
                 WHERE  c.id_doctor  = :id
-                AND    c.id_estado  != 5
+                AND    c.id_estado  IN (2, 4)
                 ORDER  BY c.fecha DESC, c.hora DESC
                 LIMIT  :limite";
         $stmt = $this->db->prepare($sql);
@@ -194,15 +194,28 @@ class CitaRepository
         return $stmt->rowCount() > 0;
     }
 
-    /**
-     * Cambia la cita a estado Rechazada (3) — solo Secretaria.
-     * Solo aplica si la cita está en estado Pendiente (1) o Aprobada (2).
-     */
     public function rechazarCita(int $idCita): bool
     {
         $sql  = "UPDATE cita SET id_estado = 3 WHERE id_cita = :id AND id_estado IN (1, 2)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $idCita]);
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * Reagenda una cita a una nueva fecha y hora, y reinicia el estado a Pendiente (1).
+     */
+    public function reagendarCita(int $idCita, string $fecha, string $hora): bool
+    {
+        $sql = "UPDATE cita 
+                SET fecha = :fecha, hora = :hora, id_estado = 1 
+                WHERE id_cita = :id AND id_estado NOT IN (4, 5)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $idCita,
+            ':fecha' => $fecha,
+            ':hora' => $hora
+        ]);
         return $stmt->rowCount() > 0;
     }
 }

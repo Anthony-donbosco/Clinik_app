@@ -27,6 +27,13 @@ class CitaController extends BaseController
 
         $idRol       = (int) $_SESSION['id_rol'];
         $idRef       = (int) ($_SESSION['id_referencia'] ?? 0);
+
+        // Admin no debe usar la vista de citas de pacientes; tiene su propia vista de supervisión
+        if ($idRol === 4) {
+            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/admin/citas');
+            exit;
+        }
+
         $doctores    = $this->repo->getDoctoresParaSelect();
         $pacientes   = [];
         $citas       = [];

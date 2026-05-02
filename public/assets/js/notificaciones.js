@@ -49,6 +49,21 @@
         }
     }
 
+    const TOASTS_KEY = 'clinik_notif_toasts';
+    function getShownToasts() {
+        try {
+            const raw = sessionStorage.getItem(TOASTS_KEY);
+            return raw ? new Set(JSON.parse(raw)) : new Set();
+        } catch { return new Set(); }
+    }
+    function markToastShown(id) {
+        try {
+            const set = getShownToasts();
+            set.add(String(id));
+            sessionStorage.setItem(TOASTS_KEY, JSON.stringify([...set]));
+        } catch {}
+    }
+
     function markRead(id) {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
@@ -302,10 +317,15 @@
                 updateBadge(unread.length);
             }
 
-            // Toasts solo para notificaciones realmente nuevas Y no leídas
-            if (!panelOpen && unread.length > lastCount && unread.length > 0) {
-                const nuevas = unread.slice(0, unread.length - lastCount);
-                nuevas.forEach(item => showToast(item));
+            // Toasts solo para notificaciones realmente nuevas Y no leídas que no se hayan mostrado en esta sesión
+            const shownToasts = getShownToasts();
+            const paraMostrar = unread.filter(item => !shownToasts.has(String(item.id)));
+
+            if (!panelOpen && paraMostrar.length > 0) {
+                paraMostrar.forEach(item => {
+                    showToast(item);
+                    markToastShown(item.id);
+                });
             }
 
             lastCount = unread.length;

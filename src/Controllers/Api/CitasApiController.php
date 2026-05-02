@@ -91,13 +91,15 @@ class CitasApiController
     }
 
     // ──────────────────────────────────────────────────────────────────────
-    //  POST /api/citas/aprobar    { id_cita: N }  — Solo Secretaria (rol 3)
+    //  POST /api/citas/aprobar    { id_cita: N }  — Solo Secretaria (3) y Admin (4)
     // ──────────────────────────────────────────────────────────────────────
     public function aprobar(): void
     {
         $this->jsonHeaders();
         if (!isset($_SESSION['id_usuario'])) { $this->json(['ok' => false, 'mensaje' => 'No autenticado.'], 401); return; }
-        if ((int) ($_SESSION['id_rol'] ?? 0) !== 3) { $this->json(['ok' => false, 'mensaje' => 'Sin permiso.'], 403); return; }
+        
+        $idRol = (int) ($_SESSION['id_rol'] ?? 0);
+        if ($idRol !== 3 && $idRol !== 4) { $this->json(['ok' => false, 'mensaje' => 'Sin permiso.'], 403); return; }
 
         $body   = json_decode(file_get_contents('php://input'), true) ?? $_POST;
         $idCita = (int) ($body['id_cita'] ?? 0);
@@ -111,13 +113,15 @@ class CitasApiController
     }
 
     // ──────────────────────────────────────────────────────────────────────
-    //  POST /api/citas/rechazar   { id_cita: N }  — Solo Secretaria (rol 3)
+    //  POST /api/citas/rechazar   { id_cita: N }  — Solo Secretaria (3) y Admin (4)
     // ──────────────────────────────────────────────────────────────────────
     public function rechazar(): void
     {
         $this->jsonHeaders();
         if (!isset($_SESSION['id_usuario'])) { $this->json(['ok' => false, 'mensaje' => 'No autenticado.'], 401); return; }
-        if ((int) ($_SESSION['id_rol'] ?? 0) !== 3) { $this->json(['ok' => false, 'mensaje' => 'Sin permiso.'], 403); return; }
+        
+        $idRol = (int) ($_SESSION['id_rol'] ?? 0);
+        if ($idRol !== 3 && $idRol !== 4) { $this->json(['ok' => false, 'mensaje' => 'Sin permiso.'], 403); return; }
 
         $body   = json_decode(file_get_contents('php://input'), true) ?? $_POST;
         $idCita = (int) ($body['id_cita'] ?? 0);
@@ -128,6 +132,31 @@ class CitasApiController
             ['ok' => $ok, 'mensaje' => $ok ? 'Cita rechazada.' : 'No se pudo rechazar (ya está en un estado final).'],
             $ok ? 200 : 422
         );
+    }
+
+    // ──────────────────────────────────────────────────────────────────────
+    //  POST /api/citas/reagendar  { id_cita: N, fecha: 'YYYY-MM-DD', hora: 'HH:MM' }
+    // ──────────────────────────────────────────────────────────────────────
+    public function reagendar(): void
+    {
+        $this->jsonHeaders();
+        if (!isset($_SESSION['id_usuario'])) { $this->json(['ok' => false, 'mensaje' => 'No autenticado.'], 401); return; }
+        
+        $idRol = (int) ($_SESSION['id_rol'] ?? 0);
+        if ($idRol !== 3 && $idRol !== 4) { $this->json(['ok' => false, 'mensaje' => 'Sin permiso.'], 403); return; }
+
+        $body   = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $idCita = (int) ($body['id_cita'] ?? 0);
+        $fecha  = trim($body['fecha'] ?? '');
+        $hora   = trim($body['hora'] ?? '');
+
+        if ($idCita <= 0 || empty($fecha) || empty($hora)) {
+            $this->json(['ok' => false, 'mensaje' => 'Parámetros incompletos.'], 400); 
+            return; 
+        }
+
+        $resultado = $this->service->reagendarCita($idCita, $fecha, $hora);
+        $this->json($resultado, $resultado['ok'] ? 200 : 422);
     }
 
     // ──────────────────────────────────────────────────────────────────────

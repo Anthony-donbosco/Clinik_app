@@ -64,7 +64,7 @@ include __DIR__ . '/../layout/head.php';
         <div class="card" id="card-mis-citas">
             <div class="card-header">
                 <h3 class="card-title">📅 Mis Citas</h3>
-                <a href="/citas" class="btn btn-primary btn-sm" id="btn-solicitar-cita">Solicitar cita</a>
+                <a href="<?= defined('BASE_PATH') ? BASE_PATH : '' ?>/citas" class="btn btn-primary btn-sm" id="btn-solicitar-cita">Solicitar cita</a>
             </div>
 
             <?php if (empty($citas)): ?>
@@ -119,7 +119,7 @@ include __DIR__ . '/../layout/head.php';
         <div class="card" id="card-historial-medico">
             <div class="card-header">
                 <h3 class="card-title">📋 Mi Historial Médico</h3>
-                <a href="/historial" class="btn btn-secondary btn-sm" id="btn-ver-historial-completo">Ver completo</a>
+                <a href="<?= defined('BASE_PATH') ? BASE_PATH : '' ?>/historial" class="btn btn-secondary btn-sm" id="btn-ver-historial-completo">Ver completo</a>
             </div>
 
             <?php if (empty($historial)): ?>

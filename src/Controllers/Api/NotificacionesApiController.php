@@ -65,7 +65,7 @@ class NotificacionesApiController
                 INNER JOIN doctor d ON c.id_doctor = d.id_doctor
                 INNER JOIN estado e ON c.id_estado = e.id_estado
                 WHERE  c.id_paciente = :id
-                AND    c.fecha BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 2 DAY)
+                AND    c.fecha >= CURDATE()
                 AND    c.id_estado NOT IN (5)
                 ORDER  BY c.fecha ASC, c.hora ASC
                 LIMIT  5";
@@ -108,15 +108,15 @@ class NotificacionesApiController
     // ── Doctor: citas de hoy pendientes de atender ─────────────────────
     private function notifDoctor(int $idDoctor): array
     {
-        $sql = "SELECT c.id_cita, c.hora,
+        $sql = "SELECT c.id_cita, c.hora, c.fecha,
                        CONCAT(p.primer_nombre, ' ', p.primer_apellido) AS nombre_paciente
                 FROM   cita c
                 INNER JOIN paciente p ON c.id_paciente = p.id_paciente
                 WHERE  c.id_doctor  = :id
-                AND    c.fecha      = CURDATE()
-                AND    c.id_estado  NOT IN (4, 5)
-                ORDER  BY c.hora ASC
-                LIMIT  5";
+                AND    c.fecha >= CURDATE()
+                AND    c.id_estado  = 2
+                ORDER  BY c.fecha ASC, c.hora ASC
+                LIMIT  7";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $idDoctor]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -127,21 +127,28 @@ class NotificacionesApiController
         foreach ($rows as $r) {
             $horaStr = substr($r['hora'], 0, 5);
             $ahora   = time();
-            $citaTs  = strtotime(date('Y-m-d') . ' ' . $r['hora']);
+            $citaTs  = strtotime($r['fecha'] . ' ' . $r['hora']);
             $diff    = $citaTs - $ahora;
+            $esHoy   = ($r['fecha'] === date('Y-m-d'));
 
-            if ($diff <= 0) {
-                $tipo   = 'warning';
-                $titulo = 'Cita pendiente de atender';
-                $msg    = 'La cita de las ' . $horaStr . ' con ' . $r['nombre_paciente'] . ' esta pendiente.';
-            } elseif ($diff <= 1800) {
-                $tipo   = 'warning';
-                $titulo = 'Proxima en ' . ceil($diff / 60) . ' min';
-                $msg    = $r['nombre_paciente'] . ' a las ' . $horaStr . '.';
+            if ($esHoy) {
+                if ($diff <= 0) {
+                    $tipo   = 'warning';
+                    $titulo = 'Cita pendiente de atender';
+                    $msg    = 'La cita de las ' . $horaStr . ' con ' . $r['nombre_paciente'] . ' esta pendiente.';
+                } elseif ($diff <= 1800) {
+                    $tipo   = 'warning';
+                    $titulo = 'Proxima en ' . ceil($diff / 60) . ' min';
+                    $msg    = $r['nombre_paciente'] . ' a las ' . $horaStr . '.';
+                } else {
+                    $tipo   = 'info';
+                    $titulo = 'Agenda de hoy';
+                    $msg    = $r['nombre_paciente'] . ' — ' . $horaStr . '.';
+                }
             } else {
                 $tipo   = 'info';
-                $titulo = 'Agenda de hoy';
-                $msg    = $r['nombre_paciente'] . ' — ' . $horaStr . '.';
+                $titulo = 'Nueva cita para manana';
+                $msg    = $r['nombre_paciente'] . ' a las ' . $horaStr . '.';
             }
 
             $items[] = [

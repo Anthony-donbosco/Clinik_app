@@ -74,7 +74,7 @@ class FacturaRepository
     public function getCitasSinFactura(): array
     {
         $sql = "SELECT c.id_cita,
-                       c.fecha, c.hora,
+                       c.fecha AS fecha_cita, c.hora AS hora_cita,
                        CONCAT(p.primer_nombre, ' ', p.primer_apellido) AS nombre_paciente,
                        p.numeroIdentificacion,
                        CONCAT(d.primer_nombre, ' ', d.primer_apellido) AS nombre_doctor,

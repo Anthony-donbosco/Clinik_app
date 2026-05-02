@@ -117,4 +117,38 @@ class CitaService
         $ok = $this->citaRepo->cancelarCita($idCita);
         return ['ok' => $ok, 'mensaje' => $ok ? 'Cita cancelada correctamente.' : 'No se pudo cancelar la cita.'];
     }
+
+    /**
+     * Reagenda una cita validando la nueva disponibilidad.
+     */
+    public function reagendarCita(int $idCita, string $fecha, string $hora): array
+    {
+        $cita = $this->citaRepo->getCitaById($idCita);
+        if (!$cita) return ['ok' => false, 'mensaje' => 'La cita no existe.'];
+        if ((int) $cita['id_estado'] === 4) return ['ok' => false, 'mensaje' => 'No se puede reagendar una cita ya atendida.'];
+        if ((int) $cita['id_estado'] === 5) return ['ok' => false, 'mensaje' => 'No se puede reagendar una cita cancelada.'];
+
+        $fecha      = trim($fecha);
+        $hora       = trim($hora) . ':00';
+        $horaHHMM   = substr($hora, 0, 5);
+
+        if ($fecha < date('Y-m-d'))
+            return ['ok' => false, 'mensaje' => 'No se puede reagendar a una fecha pasada.'];
+
+        if ((int) date('N', strtotime($fecha)) >= 6)
+            return ['ok' => false, 'mensaje' => 'La clínica no atiende los fines de semana.'];
+
+        if (!in_array($horaHHMM, $this->generarBloques(), true))
+            return ['ok' => false, 'mensaje' => 'El horario seleccionado no es válido.'];
+
+        if ($this->citaRepo->existeConflicto((int)$cita['id_doctor'], $fecha, $hora))
+            return ['ok' => false, 'mensaje' => 'El horario ' . $horaHHMM . ' ya está reservado. Elige otro.'];
+
+        try {
+            $ok = $this->citaRepo->reagendarCita($idCita, $fecha, $hora);
+            return ['ok' => $ok, 'mensaje' => $ok ? 'Cita reagendada para el ' . date('d/m/Y', strtotime($fecha)) . ' a las ' . $horaHHMM . '.' : 'No se pudo reagendar.'];
+        } catch (\Exception $e) {
+            return ['ok' => false, 'mensaje' => 'Error al reagendar: ' . $e->getMessage()];
+        }
+    }
 }
