@@ -101,6 +101,9 @@ class HistorialService
         if (mb_strlen($tratamiento) < 5) {
             return ['ok' => false, 'mensaje' => 'El tratamiento debe tener al menos 5 caracteres.', 'id_historial' => null];
         }
+        if (empty($notas)) {
+            return ['ok' => false, 'mensaje' => 'La receta / indicaciones son obligatorias.', 'id_historial' => null];
+        }
 
         // ── 2. Verificar que la cita exista y pertenezca al doctor ─────
         $citaRaw = $this->getCitaDirecta($idCita);

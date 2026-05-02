@@ -86,7 +86,12 @@ class HistorialController extends BaseController
         }
 
         $cita = $resultado['cita'];
-        $this->render('historial/atender_cita', compact('cita', 'bp'));
+
+        // Cargar historial previo del paciente (<<include>> Consultar historial)
+        $idPaciente       = (int) $cita['id_paciente'];
+        $historialPrevio  = $this->service->getHistorialPaciente($idPaciente);
+
+        $this->render('historial/atender_cita', compact('cita', 'bp', 'historialPrevio'));
     }
 
     // ──────────────────────────────────────────────────────────────────────

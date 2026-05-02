@@ -90,6 +90,20 @@ function estadoCitaClass(string $estado): string {
 
     /* Cancelar botón en tabla */
     .btn-cancelar { font-size: .78rem; padding: .3rem .75rem; }
+    .btn-accion   { font-size: .78rem; padding: .3rem .75rem; }
+    /* Botones de estado para Secretaria */
+    .btn-success {
+        background: rgba(16,185,129,.15);
+        color: #34d399;
+        border: 1px solid rgba(16,185,129,.3);
+    }
+    .btn-success:hover { background: rgba(16,185,129,.3); }
+    .btn-warning {
+        background: rgba(245,158,11,.15);
+        color: #fbbf24;
+        border: 1px solid rgba(245,158,11,.3);
+    }
+    .btn-warning:hover { background: rgba(245,158,11,.3); }
 </style>
 
 <!-- ── Topbar ──────────────────────────────────────────── -->
@@ -230,7 +244,12 @@ function estadoCitaClass(string $estado): string {
                     </thead>
                     <tbody>
                         <?php foreach ($citas as $c): ?>
-                        <?php $puedeCancelar = in_array((int)$c['id_estado'], [1, 2]); ?>
+                        <?php
+                            $idEstado     = (int)$c['id_estado'];
+                            $puedeCancelar = in_array($idEstado, [1, 2]);
+                            $puedeAprobar  = ($idRol === 3 && $idEstado === 1); // Solo Secretaria sobre Pendientes
+                            $puedeRechazar = ($idRol === 3 && in_array($idEstado, [1, 2])); // Solo Secretaria
+                        ?>
                         <tr id="fila-cita-<?= $c['id_cita'] ?>">
                             <td><?= (int)$c['id_cita'] ?></td>
                             <td><?= date('d/m/Y', strtotime($c['fecha'])) ?></td>
@@ -245,6 +264,19 @@ function estadoCitaClass(string $estado): string {
                             <td><span class="<?= estadoCitaClass($c['estado']) ?>"><?= htmlspecialchars($c['estado']) ?></span></td>
                             <?php if ($idRol !== 2): ?>
                             <td>
+                                <div style="display:flex; gap:.35rem; flex-wrap:wrap;">
+                                <?php if ($puedeAprobar): ?>
+                                <button class="btn btn-success btn-sm btn-accion"
+                                        id="btn-aprobar-<?= $c['id_cita'] ?>"
+                                        onclick="cambiarEstadoCita(<?= $c['id_cita'] ?>, 'aprobar')"
+                                        title="Aprobar esta cita">✔ Aprobar</button>
+                                <?php endif; ?>
+                                <?php if ($puedeRechazar): ?>
+                                <button class="btn btn-warning btn-sm btn-accion"
+                                        id="btn-rechazar-<?= $c['id_cita'] ?>"
+                                        onclick="cambiarEstadoCita(<?= $c['id_cita'] ?>, 'rechazar')"
+                                        title="Rechazar esta cita">✖ Rechazar</button>
+                                <?php endif; ?>
                                 <?php if ($puedeCancelar): ?>
                                 <button class="btn btn-danger btn-sm btn-cancelar"
                                         id="btn-cancelar-<?= $c['id_cita'] ?>"
@@ -253,9 +285,11 @@ function estadoCitaClass(string $estado): string {
                                         title="Cancelar esta cita">
                                     Cancelar
                                 </button>
-                                <?php else: ?>
+                                <?php endif; ?>
+                                <?php if (!$puedeCancelar && !$puedeAprobar && !$puedeRechazar): ?>
                                 <span class="text-muted" style="font-size:.8rem">—</span>
                                 <?php endif; ?>
+                                </div>
                             </td>
                             <?php endif; ?>
                         </tr>
@@ -405,6 +439,55 @@ function estadoCitaClass(string $estado): string {
                     alert('⚠ ' + (data.mensaje || 'Error al cancelar.'));
                     if (btn) { btn.textContent = 'Cancelar'; btn.disabled = false; }
                 }
+            });
+        };
+
+        /**
+         * Aprobar o Rechazar cita (solo Secretaria)
+         * accion: 'aprobar' | 'rechazar'
+         */
+        window.cambiarEstadoCita = function (idCita, accion) {
+            const label = accion === 'aprobar' ? 'aprobar' : 'rechazar';
+            if (!confirm(`¿Seguro que deseas ${label} esta cita?`)) return;
+
+            const btnAp  = document.getElementById('btn-aprobar-'  + idCita);
+            const btnRec = document.getElementById('btn-rechazar-' + idCita);
+            const btnCan = document.getElementById('btn-cancelar-' + idCita);
+            [btnAp, btnRec, btnCan].forEach(b => { if (b) { b.disabled = true; b.style.opacity = '.5'; } });
+
+            fetch(`${BASE_URL}/api/citas/${accion}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ id_cita: idCita }),
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    // Actualizar el badge de estado en la fila sin recargar página
+                    const fila = document.getElementById('fila-cita-' + idCita);
+                    if (fila) {
+                        const badge = fila.querySelector('[class*="badge estado-"]');
+                        if (badge) {
+                            const nuevoEstado = accion === 'aprobar' ? 'Aprobada' : 'Rechazada';
+                            const nuevaClase  = accion === 'aprobar' ? 'badge estado-aprobada' : 'badge badge-muted';
+                            badge.textContent  = nuevoEstado;
+                            badge.className    = nuevaClase;
+                        }
+                        // Quitar todos los botones de acción de esta fila
+                        fila.querySelectorAll('.btn-accion, .btn-cancelar').forEach(b => b.remove());
+                    }
+                } else {
+                    alert('⚠ ' + (data.mensaje || `Error al ${label}.`));
+                    [btnAp, btnRec, btnCan].forEach(b => { if (b) { b.disabled = false; b.style.opacity = '1'; } });
+                }
+            })
+            .catch(() => {
+                alert('⚠ Error de conexión.');
+                [btnAp, btnRec, btnCan].forEach(b => { if (b) { b.disabled = false; b.style.opacity = '1'; } });
             });
         };
     })();

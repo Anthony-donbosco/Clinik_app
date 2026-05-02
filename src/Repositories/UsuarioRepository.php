@@ -163,4 +163,60 @@ class UsuarioRepository
         $stmt->execute([':id' => $idUsuario]);
         return $stmt->rowCount() > 0;
     }
+
+    /**
+     * Retorna los datos del perfil de un paciente (join paciente + usuarios).
+     */
+    public function getPerfilPaciente(int $idPaciente): ?array
+    {
+        $sql = "SELECT p.id_paciente, p.primer_nombre, p.segundo_nombre,
+                       p.primer_apellido, p.segundo_apellido,
+                       p.telefono, p.numeroIdentificacion,
+                       u.correo, u.id_usuario
+                FROM   paciente p
+                INNER JOIN usuarios u ON u.id_referencia = p.id_paciente AND u.id_rol = 1
+                WHERE  p.id_paciente = :id
+                LIMIT  1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $idPaciente]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    /**
+     * Actualiza teléfono y correo de un paciente.
+     * No permite cambiar cédula ni nombre (datos sensibles).
+     *
+     * @return array ['ok' => bool, 'mensaje' => string]
+     */
+    public function actualizarPerfilPaciente(int $idPaciente, int $idUsuario, string $telefono, string $correo): array
+    {
+        // Verificar que el correo no pertenezca a otro usuario
+        $stmtCheck = $this->db->prepare(
+            "SELECT COUNT(*) FROM usuarios WHERE correo = :correo AND id_usuario != :id"
+        );
+        $stmtCheck->execute([':correo' => $correo, ':id' => $idUsuario]);
+        if ((int) $stmtCheck->fetchColumn() > 0) {
+            return ['ok' => false, 'mensaje' => 'Este correo ya está en uso por otra cuenta.'];
+        }
+
+        $this->db->beginTransaction();
+        try {
+            // Actualizar teléfono en tabla paciente
+            $sqlPac = "UPDATE paciente SET telefono = :tel WHERE id_paciente = :id";
+            $stmtPac = $this->db->prepare($sqlPac);
+            $stmtPac->execute([':tel' => $telefono, ':id' => $idPaciente]);
+
+            // Actualizar correo en tabla usuarios
+            $sqlUsr = "UPDATE usuarios SET correo = :correo WHERE id_usuario = :id";
+            $stmtUsr = $this->db->prepare($sqlUsr);
+            $stmtUsr->execute([':correo' => $correo, ':id' => $idUsuario]);
+
+            $this->db->commit();
+            return ['ok' => true, 'mensaje' => 'Perfil actualizado correctamente.'];
+        } catch (PDOException $e) {
+            $this->db->rollBack();
+            return ['ok' => false, 'mensaje' => 'Error al actualizar el perfil. Inténtalo de nuevo.'];
+        }
+    }
 }

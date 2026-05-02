@@ -9,12 +9,16 @@ include __DIR__ . '/../layout/head.php';
 ?>
 
 <!-- ── Topbar ──────────────────────────────────────────────────────── -->
-<header class="topbar">
+<header class="topbar no-print">
     <h1 class="topbar-title">📋 Mi Historial Médico</h1>
     <div class="topbar-actions">
-        <a href="<?= $bp ?>/citas" class="btn btn-secondary btn-sm" id="btn-ir-mis-citas">
-            📅 Mis Citas
-        </a>
+        <button onclick="window.print()" class="btn btn-secondary btn-sm" id="btn-imprimir-historial"
+                title="Imprimir o guardar como PDF">
+            🖨️ Imprimir
+        </button>
+        <button class="notification-btn" id="notif-bell-btn" aria-label="Notificaciones">
+            🔔 <span class="notification-dot" id="notif-dot"></span>
+        </button>
         <div class="user-avatar" title="<?= htmlspecialchars($_SESSION['nombre'] ?? '') ?>">
             <?= strtoupper(substr($_SESSION['nombre'] ?? 'P', 0, 1)) ?>
         </div>
@@ -125,7 +129,7 @@ include __DIR__ . '/../layout/head.php';
 
                             <?php if (!empty($h['notas'])): ?>
                             <div class="timeline-section">
-                                <p class="timeline-section-label">Notas Adicionales</p>
+                                <p class="timeline-section-label">Receta / Indicaciones</p>
                                 <p class="timeline-section-text timeline-notas"><?= nl2br(htmlspecialchars($h['notas'], ENT_QUOTES, 'UTF-8')) ?></p>
                             </div>
                             <?php endif; ?>
@@ -242,6 +246,53 @@ include __DIR__ . '/../layout/head.php';
 @media (max-width: 600px) {
     .timeline-item { grid-template-columns: 70px 20px 1fr; gap: 0 .5rem; }
     .timeline-date { font-size:.7rem; }
+}
+
+/* ── Estilos de Impresion (Diagrama 7 Paso 9) ─────────── */
+@media print {
+    .sidebar, .no-print, .topbar-actions { display: none !important; }
+    .page-content { margin-left: 0 !important; padding: 1rem !important; }
+    .stats-grid { display: none; }
+
+    /* Cabecera institucional */
+    body::before {
+        content: 'CLINI-K -- Historial Medico del Paciente';
+        display: block;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #000;
+        padding-bottom: .5rem;
+        color: #000;
+    }
+
+    body, .timeline-card, .page-content, main {
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .timeline-card {
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
+        box-shadow: none !important;
+    }
+    .timeline-dot { background: #000 !important; box-shadow: none !important; }
+    .timeline-line { background: #ccc !important; }
+    .timeline-date, .timeline-time, .timeline-doctor,
+    .timeline-section-label { color: #000 !important; }
+    .timeline-section-text {
+        background: #f5f5f5 !important;
+        color: #222 !important;
+        border: 1px solid #ddd !important;
+    }
+    .badge { border: 1px solid #999 !important; color: #000 !important; background: #eee !important; }
+    .timeline-registered { color: #555 !important; }
+    .topbar { background: #fff !important; }
+    .topbar-title { color: #000 !important; font-size: 1rem; }
+    a { text-decoration: none !important; color: #000 !important; }
+    .page-header h2 { color: #000 !important; }
+    .page-header p { color: #333 !important; }
 }
 </style>
 

@@ -91,6 +91,46 @@ class CitasApiController
     }
 
     // ──────────────────────────────────────────────────────────────────────
+    //  POST /api/citas/aprobar    { id_cita: N }  — Solo Secretaria (rol 3)
+    // ──────────────────────────────────────────────────────────────────────
+    public function aprobar(): void
+    {
+        $this->jsonHeaders();
+        if (!isset($_SESSION['id_usuario'])) { $this->json(['ok' => false, 'mensaje' => 'No autenticado.'], 401); return; }
+        if ((int) ($_SESSION['id_rol'] ?? 0) !== 3) { $this->json(['ok' => false, 'mensaje' => 'Sin permiso.'], 403); return; }
+
+        $body   = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $idCita = (int) ($body['id_cita'] ?? 0);
+        if ($idCita <= 0) { $this->json(['ok' => false, 'mensaje' => 'ID de cita inválido.'], 400); return; }
+
+        $ok = $this->repo->aprobarCita($idCita);
+        $this->json(
+            ['ok' => $ok, 'mensaje' => $ok ? 'Cita aprobada correctamente.' : 'No se pudo aprobar (ya no está Pendiente).'],
+            $ok ? 200 : 422
+        );
+    }
+
+    // ──────────────────────────────────────────────────────────────────────
+    //  POST /api/citas/rechazar   { id_cita: N }  — Solo Secretaria (rol 3)
+    // ──────────────────────────────────────────────────────────────────────
+    public function rechazar(): void
+    {
+        $this->jsonHeaders();
+        if (!isset($_SESSION['id_usuario'])) { $this->json(['ok' => false, 'mensaje' => 'No autenticado.'], 401); return; }
+        if ((int) ($_SESSION['id_rol'] ?? 0) !== 3) { $this->json(['ok' => false, 'mensaje' => 'Sin permiso.'], 403); return; }
+
+        $body   = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $idCita = (int) ($body['id_cita'] ?? 0);
+        if ($idCita <= 0) { $this->json(['ok' => false, 'mensaje' => 'ID de cita inválido.'], 400); return; }
+
+        $ok = $this->repo->rechazarCita($idCita);
+        $this->json(
+            ['ok' => $ok, 'mensaje' => $ok ? 'Cita rechazada.' : 'No se pudo rechazar (ya está en un estado final).'],
+            $ok ? 200 : 422
+        );
+    }
+
+    // ──────────────────────────────────────────────────────────────────────
     //  Helpers privados
     // ──────────────────────────────────────────────────────────────────────
 

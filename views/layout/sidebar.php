@@ -12,6 +12,7 @@ $menus = [
     3 => [ // Secretaria
         ['icon' => '🏠', 'label' => 'Dashboard',     'href' => '/dashboard/secretaria'],
         ['icon' => '📅', 'label' => 'Citas',          'href' => '/citas'],
+        ['icon' => '🧾', 'label' => 'Facturas',       'href' => '/facturas'],
         ['icon' => '👤', 'label' => 'Pacientes',      'href' => '/pacientes'],
         ['icon' => '🩺', 'label' => 'Doctores',       'href' => '/doctores'],
     ],
@@ -24,6 +25,8 @@ $menus = [
         ['icon' => '🏠', 'label' => 'Dashboard',     'href' => '/dashboard/paciente'],
         ['icon' => '📅', 'label' => 'Mis Citas',     'href' => '/citas'],
         ['icon' => '📋', 'label' => 'Mi Historial',  'href' => '/historial'],
+        ['icon' => '🧾', 'label' => 'Mis Facturas',  'href' => '/facturas'],
+        ['icon' => '👤', 'label' => 'Mi Perfil',     'href' => '/paciente/perfil'],
     ],
     4 => [ // Admin
         ['icon' => '🏠', 'label' => 'Panel Admin',   'href' => '/admin'],

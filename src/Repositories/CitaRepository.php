@@ -181,4 +181,28 @@ class CitaRepository
         $stmt->execute([':id' => $idCita]);
         return $stmt->rowCount() > 0;
     }
+
+    /**
+     * Cambia la cita a estado Aprobada (2) — solo Secretaria.
+     * Solo aplica si la cita está en estado Pendiente (1).
+     */
+    public function aprobarCita(int $idCita): bool
+    {
+        $sql  = "UPDATE cita SET id_estado = 2 WHERE id_cita = :id AND id_estado = 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $idCita]);
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * Cambia la cita a estado Rechazada (3) — solo Secretaria.
+     * Solo aplica si la cita está en estado Pendiente (1) o Aprobada (2).
+     */
+    public function rechazarCita(int $idCita): bool
+    {
+        $sql  = "UPDATE cita SET id_estado = 3 WHERE id_cita = :id AND id_estado IN (1, 2)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $idCita]);
+        return $stmt->rowCount() > 0;
+    }
 }

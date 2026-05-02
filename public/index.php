@@ -53,6 +53,8 @@ $routes = [
         '/admin/crear-usuario'     => ['App\Controllers\Web\AdminController',            'showCrear'],
         '/api/notificaciones'       => ['App\Controllers\Api\NotificacionesApiController', 'index'],
         '/api/citas/disponibilidad' => ['App\Controllers\Api\CitasApiController',         'disponibilidad'],
+        '/facturas'                 => ['App\Controllers\Web\FacturaController',           'index'],
+        '/paciente/perfil'          => ['App\Controllers\Web\PacienteController',          'perfil'],
     ],
     'POST' => [
         '/login'                => ['App\Controllers\Web\AuthController',      'processLogin'],
@@ -64,6 +66,10 @@ $routes = [
         '/admin/reactivar'      => ['App\Controllers\Web\AdminController',     'reactivar'],
         '/api/citas/reservar'   => ['App\Controllers\Api\CitasApiController',  'reservar'],
         '/api/citas/cancelar'   => ['App\Controllers\Api\CitasApiController',  'cancelar'],
+        '/api/citas/aprobar'    => ['App\Controllers\Api\CitasApiController',  'aprobar'],
+        '/api/citas/rechazar'   => ['App\Controllers\Api\CitasApiController',  'rechazar'],
+        '/facturas/crear'       => ['App\Controllers\Web\FacturaController',   'crear'],
+        '/paciente/perfil'      => ['App\Controllers\Web\PacienteController',  'actualizarPerfil'],
     ],
 ];
 

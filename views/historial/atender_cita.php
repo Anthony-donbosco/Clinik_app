@@ -69,6 +69,67 @@ unset($_SESSION['flash_error'], $_SESSION['flash_success']);
         </div>
     </section>
 
+    <!-- ── Historial Previo del Paciente (<<include>> Consultar historial) ── -->
+    <section class="content-grid" style="grid-template-columns:1fr;" id="section-historial-previo">
+        <div class="card" id="card-historial-previo">
+            <div class="card-header" style="cursor:pointer;" id="btn-toggle-historial"
+                 onclick="toggleHistorialPrevio()" aria-expanded="false">
+                <h3 class="card-title">
+                    📋 Historial Previo del Paciente
+                    <?php if (!empty($historialPrevio)): ?>
+                        <span class="badge badge-primary" style="margin-left:.5rem;">
+                            <?= count($historialPrevio) ?> consulta(s)
+                        </span>
+                    <?php else: ?>
+                        <span class="badge badge-muted" style="margin-left:.5rem;">Sin historial</span>
+                    <?php endif; ?>
+                </h3>
+                <span id="toggle-icon-historial" style="font-size:1.1rem; transition:transform .2s;">▼</span>
+            </div>
+
+            <div id="historial-previo-content" style="display:none;">
+                <?php if (empty($historialPrevio)): ?>
+                    <div class="table-empty" style="padding:1.25rem;">
+                        <span>📭</span>
+                        Este paciente no tiene consultas previas registradas.
+                    </div>
+                <?php else: ?>
+                    <div style="display:flex; flex-direction:column; gap:.85rem; padding:.5rem 0 .25rem;">
+                        <?php foreach ($historialPrevio as $h): ?>
+                        <div class="historial-previo-item" id="hprev-<?= (int)$h['id_historial'] ?>">
+                            <div class="hprev-header">
+                                <span class="hprev-fecha">
+                                    📅 <?= date('d/m/Y', strtotime($h['fecha_cita'])) ?>
+                                    · <?= substr($h['hora_cita'], 0, 5) ?>
+                                </span>
+                                <span class="badge badge-primary" style="font-size:.72rem;">
+                                    <?= htmlspecialchars($h['especialidad'] ?? '') ?>
+                                </span>
+                            </div>
+                            <div class="hprev-body">
+                                <div class="hprev-campo">
+                                    <span class="hprev-label">Diagnóstico</span>
+                                    <span class="hprev-valor"><?= htmlspecialchars($h['diagnostico'] ?? '—') ?></span>
+                                </div>
+                                <div class="hprev-campo">
+                                    <span class="hprev-label">Tratamiento</span>
+                                    <span class="hprev-valor"><?= htmlspecialchars($h['tratamiento'] ?? '—') ?></span>
+                                </div>
+                                <?php if (!empty($h['notas'])): ?>
+                                <div class="hprev-campo">
+                                    <span class="hprev-label">Notas / Receta</span>
+                                    <span class="hprev-valor"><?= htmlspecialchars($h['notas']) ?></span>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+
     <!-- ── Formulario historial ───────────────────────────────────── -->
     <section class="content-grid" style="grid-template-columns:1fr;">
         <div class="card" id="card-form-historial">
@@ -120,18 +181,22 @@ unset($_SESSION['flash_error'], $_SESSION['flash_success']);
                     <small class="form-hint">Mínimo 5 caracteres. Máximo 2000.</small>
                 </div>
 
-                <!-- Notas adicionales -->
+                <!-- Receta / Indicaciones (Obligatorio per Diagrama 7 Paso 6) -->
                 <div class="form-group">
-                    <label class="form-label" for="notas">Notas Adicionales</label>
+                    <label class="form-label" for="notas">
+                        Receta / Indicaciones <span class="required">*</span>
+                    </label>
                     <textarea
                         id="notas"
                         name="notas"
                         class="form-control"
                         rows="3"
+                        minlength="5"
                         maxlength="2000"
-                        placeholder="Observaciones adicionales, alergias conocidas, seguimiento recomendado..."
+                        placeholder="Ej: Amoxicilina 500mg cada 8h por 7 días. Reposo absoluto 3 días..."
+                        required
                     ></textarea>
-                    <small class="form-hint">Opcional. Máximo 2000 caracteres.</small>
+                    <small class="form-hint">Obligatorio. Incluye medicamentos, dosis y cuidados en casa. Máx. 2000 caracteres.</small>
                 </div>
 
                 <!-- Aviso bloqueo -->
@@ -210,13 +275,39 @@ unset($_SESSION['flash_error'], $_SESSION['flash_success']);
     padding-top: .5rem;
     border-top: 1px solid var(--border-subtle);
 }
+
+/* ── Historial Previo ──────────────────────────────── */
+.historial-previo-item {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color .2s;
+}
+.historial-previo-item:hover { border-color: var(--border-medium); }
+.hprev-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .6rem .9rem;
+    background: rgba(255,255,255,.03);
+    border-bottom: 1px solid var(--border-subtle);
+}
+.hprev-fecha { font-size: .82rem; font-weight: 600; color: var(--text-secondary); }
+.hprev-body  { padding: .75rem .9rem; display: flex; flex-direction: column; gap: .5rem; }
+.hprev-campo { display: flex; gap: .5rem; align-items: baseline; }
+.hprev-label {
+    font-size: .72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .05em;
+    color: var(--text-muted); min-width: 90px; flex-shrink: 0;
+}
+.hprev-valor { font-size: .875rem; color: var(--text-primary); line-height: 1.4; }
+#btn-toggle-historial:hover .card-title { color: var(--color-primary); }
 </style>
 
 <script>
 /* Validacion cliente antes de enviar */
 document.getElementById('form-historial').addEventListener('submit', function(e) {
-    const diag = document.getElementById('diagnostico').value.trim();
-    const trat = document.getElementById('tratamiento').value.trim();
+    const diag  = document.getElementById('diagnostico').value.trim();
+    const trat  = document.getElementById('tratamiento').value.trim();
+    const notas = document.getElementById('notas').value.trim();
     if (diag.length < 10) {
         e.preventDefault();
         alert('El diagnóstico debe tener al menos 10 caracteres.');
@@ -227,8 +318,25 @@ document.getElementById('form-historial').addEventListener('submit', function(e)
         e.preventDefault();
         alert('El tratamiento debe tener al menos 5 caracteres.');
         document.getElementById('tratamiento').focus();
+        return;
+    }
+    if (notas.length < 5) {
+        e.preventDefault();
+        alert('La receta / indicaciones son obligatorias (mínimo 5 caracteres).');
+        document.getElementById('notas').focus();
+        return;
     }
 });
+
+function toggleHistorialPrevio() {
+    const content = document.getElementById('historial-previo-content');
+    const icon    = document.getElementById('toggle-icon-historial');
+    const btn     = document.getElementById('btn-toggle-historial');
+    const visible = content.style.display !== 'none';
+    content.style.display = visible ? 'none' : 'block';
+    icon.style.transform  = visible ? 'rotate(0deg)' : 'rotate(180deg)';
+    btn.setAttribute('aria-expanded', String(!visible));
+}
 </script>
 
 <?php include __DIR__ . '/../layout/foot.php'; ?>

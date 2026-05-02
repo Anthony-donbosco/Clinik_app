@@ -82,6 +82,7 @@ class NotificacionesApiController
 
             if ($estado === 4) {
                 $items[] = [
+                    'id'      => 'pac-hist-' . $r['id_cita'],  // ID estable y único
                     'tipo'    => 'success',
                     'icono'   => '📋',
                     'titulo'  => 'Consulta completada',
@@ -91,6 +92,7 @@ class NotificacionesApiController
                 ];
             } else {
                 $items[] = [
+                    'id'      => 'pac-cita-' . $r['id_cita'],  // ID estable y único
                     'tipo'    => 'info',
                     'icono'   => '📅',
                     'titulo'  => 'Cita ' . $fechaStr,
@@ -143,6 +145,7 @@ class NotificacionesApiController
             }
 
             $items[] = [
+                'id'      => 'doc-cita-' . $r['id_cita'],  // ID estable y único
                 'tipo'    => $tipo,
                 'icono'   => '🩺',
                 'titulo'  => $titulo,
@@ -165,6 +168,7 @@ class NotificacionesApiController
         if ($pendientes > 0) {
             $s = $pendientes > 1 ? 's' : '';
             $items[] = [
+                'id'      => 'sec-pending-' . date('Y-m-d'),   // cambia cada día, se resetea diariamente
                 'tipo'    => 'warning',
                 'icono'   => '⏳',
                 'titulo'  => $pendientes . ' cita' . $s . ' pendiente' . $s,
@@ -177,6 +181,7 @@ class NotificacionesApiController
         if ($citasHoy > 0) {
             $s = $citasHoy > 1 ? 's' : '';
             $items[] = [
+                'id'      => 'sec-today-' . date('Y-m-d'),     // cambia cada día
                 'tipo'    => 'info',
                 'icono'   => '📅',
                 'titulo'  => $citasHoy . ' cita' . $s . ' hoy',
