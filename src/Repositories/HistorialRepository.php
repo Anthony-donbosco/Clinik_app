@@ -185,6 +185,53 @@ class HistorialRepository
     }
 
     /**
+     * Actualiza un historial medico existente.
+     * Modifica diagnostico, tratamiento y receta.
+     */
+    public function actualizarHistorial(int $idHistorial, string $diagnostico, string $tratamiento, string $notas): bool
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Actualizar diagnostico
+            $sqlDiag = "UPDATE diagnostico SET descripcion = :descripcion WHERE id_historial = :id_historial";
+            $stmtDiag = $this->db->prepare($sqlDiag);
+            $stmtDiag->execute([':id_historial' => $idHistorial, ':descripcion' => $diagnostico]);
+
+            // 2. Actualizar tratamiento
+            $sqlTrat = "UPDATE tratamiento SET descripcion = :descripcion WHERE id_historial = :id_historial";
+            $stmtTrat = $this->db->prepare($sqlTrat);
+            $stmtTrat->execute([':id_historial' => $idHistorial, ':descripcion' => $tratamiento]);
+
+            // 3. Actualizar receta (si no existia, habria que hacer INSERT ON DUPLICATE KEY, o simplemente asumiendo que existe o no existe)
+            // Ya que el esquema no tiene ON DUPLICATE KEY, verificamos si existe receta:
+            $stmtCheck = $this->db->prepare("SELECT COUNT(*) FROM receta WHERE id_historial = :id");
+            $stmtCheck->execute([':id' => $idHistorial]);
+            $existeReceta = (int) $stmtCheck->fetchColumn() > 0;
+
+            if ($existeReceta) {
+                if (empty(trim($notas))) {
+                    $this->db->prepare("DELETE FROM receta WHERE id_historial = :id")->execute([':id' => $idHistorial]);
+                } else {
+                    $this->db->prepare("UPDATE receta SET indicaciones = :notas WHERE id_historial = :id")
+                             ->execute([':id' => $idHistorial, ':notas' => trim($notas)]);
+                }
+            } else {
+                if (!empty(trim($notas))) {
+                    $this->db->prepare("INSERT INTO receta (id_historial, indicaciones) VALUES (:id, :notas)")
+                             ->execute([':id' => $idHistorial, ':notas' => trim($notas)]);
+                }
+            }
+
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
      * Marca la cita como Atendida (id_estado = 4).
      */
     public function marcarCitaAtendida(int $idCita): bool

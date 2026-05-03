@@ -118,7 +118,7 @@ include __DIR__ . '/../layout/head.php';
         <!-- ── Mi Historial Médico ────────────────────────── -->
         <div class="card" id="card-historial-medico">
             <div class="card-header">
-                <h3 class="card-title">📋 Mi Historial Médico</h3>
+                <h3 class="card-title">Mi Historial Médico</h3>
                 <a href="<?= defined('BASE_PATH') ? BASE_PATH : '' ?>/historial" class="btn btn-secondary btn-sm" id="btn-ver-historial-completo">Ver completo</a>
             </div>
 

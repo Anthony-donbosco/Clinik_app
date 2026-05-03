@@ -97,6 +97,7 @@ include __DIR__ . '/../layout/head.php';
                         <?php
                             $estadoClass = match((int)$cita['id_estado']) {
                                 1 => 'badge estado-pendiente',
+                                2 => 'badge estado-aprobada',
                                 4 => 'badge estado-atendida',
                                 5 => 'badge estado-cancelada',
                                 default => 'badge badge-muted',
@@ -123,7 +124,7 @@ include __DIR__ . '/../layout/head.php';
                                     <a href="<?= defined('BASE_PATH') ? BASE_PATH : '' ?>/historial"
                                        class="btn btn-secondary btn-sm"
                                        id="btn-historial-cita-<?= (int)$cita['id_cita'] ?>">
-                                        📋 Ver historial
+                                        Ver historial
                                     </a>
                                 <?php else: ?>
                                     <span class="text-muted" style="font-size:.8rem">—</span>

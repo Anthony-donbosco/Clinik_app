@@ -140,6 +140,52 @@ class HistorialService
     }
 
     /**
+     * Obtiene un historial para edicion si cumple las reglas (es del doctor, menos de 24h).
+     */
+    public function getHistorialParaEditar(int $idHistorial, int $idDoctor): array
+    {
+        $historial = $this->historialRepo->getHistorialById($idHistorial);
+        if (!$historial) {
+            return ['ok' => false, 'historial' => null, 'mensaje' => 'El historial no existe.'];
+        }
+        if ((int) $historial['id_doctor'] !== $idDoctor) {
+            return ['ok' => false, 'historial' => null, 'mensaje' => 'No tienes permiso para editar este historial.'];
+        }
+        if ($this->estaBloqueoEdicion($historial)) {
+            return ['ok' => false, 'historial' => null, 'mensaje' => 'Han pasado mas de ' . self::BLOQUEO_EDICION_HORAS . ' horas. Ya no puede ser editado.'];
+        }
+        return ['ok' => true, 'historial' => $historial, 'mensaje' => ''];
+    }
+
+    /**
+     * Valida y actualiza un historial medico existente.
+     */
+    public function actualizarHistorial(array $data): array
+    {
+        $idHistorial = (int) ($data['id_historial'] ?? 0);
+        $idDoctor    = (int) ($data['id_doctor']  ?? 0);
+        $diagnostico = trim($data['diagnostico']  ?? '');
+        $tratamiento = trim($data['tratamiento']  ?? '');
+        $notas       = trim($data['notas']        ?? '');
+
+        if ($idHistorial <= 0 || $idDoctor <= 0) {
+            return ['ok' => false, 'mensaje' => 'Datos invalidos.'];
+        }
+        if (mb_strlen($diagnostico) < 10) return ['ok' => false, 'mensaje' => 'El diagnostico debe tener al menos 10 caracteres.'];
+        if (mb_strlen($tratamiento) < 5) return ['ok' => false, 'mensaje' => 'El tratamiento debe tener al menos 5 caracteres.'];
+        if (empty($notas)) return ['ok' => false, 'mensaje' => 'La receta / indicaciones son obligatorias.'];
+
+        $check = $this->getHistorialParaEditar($idHistorial, $idDoctor);
+        if (!$check['ok']) {
+            return ['ok' => false, 'mensaje' => $check['mensaje']];
+        }
+
+        $this->historialRepo->actualizarHistorial($idHistorial, $diagnostico, $tratamiento, $notas);
+
+        return ['ok' => true, 'mensaje' => 'Historial medico actualizado exitosamente.'];
+    }
+
+    /**
      * Verifica si un historial ya no puede editarse (mas de 24h desde su creacion).
      */
     public function estaBloqueoEdicion(array $historial): bool

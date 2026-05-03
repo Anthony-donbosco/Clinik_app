@@ -122,7 +122,7 @@ include __DIR__ . '/../layout/head.php';
                     ) ?>
                 </div>
                 <div class="perfil-id" style="margin-top:.5rem;">
-                    📋 <?= htmlspecialchars($perfil['numeroIdentificacion']) ?>
+                    <?= htmlspecialchars($perfil['numeroIdentificacion']) ?>
                 </div>
             </div>
 
@@ -200,15 +200,6 @@ include __DIR__ . '/../layout/head.php';
                                maxlength="15">
                     </div>
 
-                </div>
-
-                <!-- Aviso contraseña -->
-                <div class="alert" style="margin-top:1.25rem;
-                     background:rgba(6,182,212,.06); border:1px solid rgba(6,182,212,.2);
-                     border-radius:var(--radius-md); padding:.75rem 1rem;
-                     font-size:.83rem; color:var(--text-secondary);">
-                    🔑 <strong>¿Deseas cambiar tu contraseña?</strong>
-                    Cierra sesión y usa la opción de recuperación, o comunícate con la secretaría.
                 </div>
 
                 <div style="display:flex; justify-content:flex-end; margin-top:1.25rem; gap:.75rem;">

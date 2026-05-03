@@ -58,8 +58,9 @@ class CitaRepository
         return $row ?: null;
     }
 
-    public function getAllCitas(int $limite = 50, int $offset = 0): array
+    public function getAllCitas(int $limite = 150, int $offset = 0, string $fecha = ''): array
     {
+        $fechaCond = $fecha ? "AND c.fecha = :fecha" : "";
         $sql = "SELECT c.id_cita, c.fecha, c.hora, c.id_estado,
                        CONCAT(p.primer_nombre, ' ', p.primer_apellido) AS nombre_paciente,
                        CONCAT(d.primer_nombre, ' ', d.primer_apellido) AS nombre_doctor,
@@ -69,18 +70,20 @@ class CitaRepository
                 INNER JOIN paciente p ON c.id_paciente = p.id_paciente
                 INNER JOIN doctor   d ON c.id_doctor   = d.id_doctor
                 INNER JOIN estado   e ON c.id_estado   = e.id_estado
-                WHERE  c.id_estado != 9
-                ORDER  BY c.fecha DESC, c.hora DESC
+                WHERE  c.id_estado != 9 $fechaCond
+                ORDER  BY c.id_cita DESC
                 LIMIT  :limite OFFSET :offset";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':limite',  $limite,  PDO::PARAM_INT);
         $stmt->bindValue(':offset',  $offset,  PDO::PARAM_INT);
+        if ($fecha) $stmt->bindValue(':fecha', $fecha);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getCitasByDoctor(int $idDoctor, int $limite = 30): array
+    public function getCitasByDoctor(int $idDoctor, int $limite = 150, string $fecha = ''): array
     {
+        $fechaCond = $fecha ? "AND c.fecha = :fecha" : "";
         $sql = "SELECT c.id_cita, c.fecha, c.hora, c.id_estado,
                        CONCAT(p.primer_nombre, ' ', p.primer_apellido) AS nombre_paciente,
                        p.numeroIdentificacion,
@@ -89,18 +92,20 @@ class CitaRepository
                 INNER JOIN paciente p ON c.id_paciente = p.id_paciente
                 INNER JOIN estado   e ON c.id_estado   = e.id_estado
                 WHERE  c.id_doctor  = :id
-                AND    c.id_estado  IN (2, 4)
-                ORDER  BY c.fecha DESC, c.hora DESC
+                AND    c.id_estado  IN (2, 4) $fechaCond
+                ORDER  BY c.id_cita DESC
                 LIMIT  :limite";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id',     $idDoctor, PDO::PARAM_INT);
         $stmt->bindValue(':limite', $limite,   PDO::PARAM_INT);
+        if ($fecha) $stmt->bindValue(':fecha', $fecha);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getCitasByPaciente(int $idPaciente, int $limite = 20): array
+    public function getCitasByPaciente(int $idPaciente, int $limite = 150, string $fecha = ''): array
     {
+        $fechaCond = $fecha ? "AND c.fecha = :fecha" : "";
         $sql = "SELECT c.id_cita, c.fecha, c.hora, c.id_estado,
                        CONCAT(d.primer_nombre, ' ', d.primer_apellido) AS nombre_doctor,
                        d.especialidad,
@@ -108,12 +113,13 @@ class CitaRepository
                 FROM   cita c
                 INNER JOIN doctor  d ON c.id_doctor  = d.id_doctor
                 INNER JOIN estado  e ON c.id_estado  = e.id_estado
-                WHERE  c.id_paciente = :id
-                ORDER  BY c.fecha DESC, c.hora DESC
+                WHERE  c.id_paciente = :id $fechaCond
+                ORDER  BY c.id_cita DESC
                 LIMIT  :limite";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id',     $idPaciente, PDO::PARAM_INT);
         $stmt->bindValue(':limite', $limite,      PDO::PARAM_INT);
+        if ($fecha) $stmt->bindValue(':fecha', $fecha);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

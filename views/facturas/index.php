@@ -14,10 +14,15 @@ include __DIR__ . '/../layout/head.php';
 /* ── Módulo Facturas ──────────────────────────────── */
 .form-factura {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 1.25rem;
 }
-@media (max-width: 640px) { .form-factura { grid-template-columns: 1fr; } }
+
+@media (min-width: 1024px) {
+    .custom-layout {
+        grid-template-columns: 320px 1fr !important;
+    }
+}
 
 .form-group label {
     display: block;
@@ -70,8 +75,76 @@ tr.selected-row td { background: rgba(6,182,212,.07); }
 
 /* Botón imprimir */
 @media print {
-    .sidebar, .topbar, .no-print { display: none !important; }
-    .page-content { margin: 0 !important; padding: 0 !important; }
+    /* 1. Limpiar los textos del navegador (Fecha, URL, etc.) */
+    @page {
+        margin: 1.5cm; 
+    }
+
+    /* 2. Evitar páginas extra en blanco reajustando el body */
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        background: white !important;
+    }
+
+    /* 3. Damos el margen a la página principal en lugar del body */
+    #facturas-page {
+        padding: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important; /* Evita que el padding desborde la hoja */
+    }
+
+    /* 4. Ocultar elementos no deseados */
+    .sidebar, .topbar, .no-print, #card-nueva-factura { 
+        display: none !important; 
+    }
+    
+    /* 5. ANIQUILAR EL GRID: Matamos el espacio del formulario izquierdo */
+    .content-grid, .custom-layout { 
+        display: block !important; 
+        grid-template-columns: 1fr !important; /* Si insiste en ser grid, lo forzamos a 1 sola columna */
+        width: 100% !important; 
+        gap: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* 6. Limpiar la tarjeta y forzarla a tomar todo el ancho */
+    #card-listado-facturas { 
+        display: block !important;
+        width: 100% !important; 
+        max-width: 100% !important;
+        grid-column: 1 / -1 !important; /* Asegura que tome todo el espacio disponible */
+        border: none !important; 
+        box-shadow: none !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+    }
+    
+    /* 7. LIBERAR LA TABLA */
+    .table-wrapper { 
+        overflow: visible !important; 
+        width: 100% !important; 
+    }
+    
+    #tabla-facturas { 
+        width: 100% !important; 
+        margin: 0 auto !important;
+    }
+    
+    /* 8. Mantener la paginación visible completa */
+    #tabla-facturas tbody tr { 
+        display: table-row !important; 
+    }
+    
+    /* 9. Eliminar el espacio del sidebar de la plantilla base */
+    .app-layout, .main-content {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
 }
 </style>
 
@@ -102,7 +175,7 @@ tr.selected-row td { background: rgba(6,182,212,.07); }
         </div>
     <?php endif; ?>
 
-    <div class="content-grid" style="align-items: start;">
+    <div class="content-grid custom-layout" style="align-items: start;">
 
         <!-- ════════════════════════════════════════════════
              FORMULARIO NUEVA FACTURA (solo Secretaria)
@@ -181,6 +254,21 @@ tr.selected-row td { background: rgba(6,182,212,.07); }
 
                 </div>
             </form>
+            
+            <?php if (!empty($citasSinFactura)): ?>
+            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-medium);">
+                <h4 style="font-size:.9rem; color:var(--text-muted); margin-bottom:.75rem; text-transform:uppercase; letter-spacing:.05em;">Faltantes por facturar</h4>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:.5rem;">
+                    <?php foreach ($citasSinFactura as $c): ?>
+                    <li style="background:rgba(255,255,255,0.03); border:1px solid var(--border-medium); border-radius:var(--radius-sm); padding:.5rem .75rem; font-size:.85rem;">
+                        <strong style="color:var(--text-primary);">#<?= $c['id_cita'] ?> - <?= date('d/m/Y', strtotime($c['fecha_cita'])) ?></strong><br>
+                        <span style="color:var(--text-secondary);"><?= htmlspecialchars($c['nombre_paciente']) ?></span>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <?php endif; ?>
+
             <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -190,11 +278,16 @@ tr.selected-row td { background: rgba(6,182,212,.07); }
         ═══════════════════════════════════════════════════ -->
         <div class="card" id="card-listado-facturas"
              <?= $idRol === 1 ? 'style="grid-column:1/-1"' : '' ?>>
-            <div class="card-header">
+            <div class="card-header" style="flex-wrap:wrap; gap:1rem;">
                 <h2 class="card-title">
-                    <?= $idRol === 1 ? '📋 Mis Facturas' : '📋 Todas las Facturas' ?>
+                    <?= $idRol === 1 ? 'Mis Facturas' : 'Todas las Facturas' ?>
                 </h2>
-                <div style="display:flex; gap:.75rem; align-items:center;">
+                <div style="display:flex; gap:.75rem; align-items:center; flex-wrap:wrap;">
+                    <form method="GET" action="<?= $bp ?>/facturas" style="display:flex; gap:.5rem; align-items:center;">
+                        <input type="date" name="fecha" value="<?= htmlspecialchars($fechaFiltro) ?>" class="form-control" style="padding:.4rem; width:auto; font-size:.85rem;">
+                        <button type="submit" class="btn btn-secondary btn-sm">Filtrar</button>
+                        <a href="<?= $bp ?>/facturas?fecha=" class="btn btn-secondary btn-sm" title="Ver todas">Todas</a>
+                    </form>
                     <span class="badge badge-primary"><?= count($facturas) ?> registro(s)</span>
                     <button class="btn btn-secondary btn-sm no-print"
                             id="btn-imprimir-facturas"
@@ -286,6 +379,59 @@ tr.selected-row td { background: rgba(6,182,212,.07); }
             inputDetalle.value = 'Consulta Especialidad ' + especialidad;
         }
     });
+})();
+</script>
+
+<script>
+// Paginación de facturas
+(function() {
+    const tbody = document.querySelector('#tabla-facturas tbody');
+    if (tbody) {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const rowsPerPage = 15;
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+        if (totalPages > 1) {
+            const paginationControls = document.createElement('div');
+            paginationControls.className = 'pagination-controls no-print';
+            paginationControls.style.display = 'flex';
+            paginationControls.style.justifyContent = 'center';
+            paginationControls.style.gap = '.5rem';
+            paginationControls.style.marginTop = '1rem';
+
+            function renderPage(page) {
+                rows.forEach((row, index) => {
+                    row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? '' : 'none';
+                });
+                
+                paginationControls.innerHTML = '';
+                
+                const btnPrev = document.createElement('button');
+                btnPrev.className = 'btn btn-secondary btn-sm';
+                btnPrev.textContent = '« Ant';
+                btnPrev.disabled = page === 1;
+                btnPrev.onclick = () => renderPage(page - 1);
+                paginationControls.appendChild(btnPrev);
+                
+                const span = document.createElement('span');
+                span.style.padding = '0.3rem 0.75rem';
+                span.style.fontSize = '0.85rem';
+                span.style.color = 'var(--text-secondary)';
+                span.textContent = `Pág ${page} de ${totalPages}`;
+                paginationControls.appendChild(span);
+                
+                const btnNext = document.createElement('button');
+                btnNext.className = 'btn btn-secondary btn-sm';
+                btnNext.textContent = 'Sig »';
+                btnNext.disabled = page === totalPages;
+                btnNext.onclick = () => renderPage(page + 1);
+                paginationControls.appendChild(btnNext);
+            }
+
+            document.querySelector('#card-listado-facturas .table-wrapper').after(paginationControls);
+            renderPage(1);
+        }
+    }
 })();
 </script>
 

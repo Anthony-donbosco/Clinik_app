@@ -115,7 +115,7 @@ $preNid       = $old['nid']       ?? '';
             <?php if (!$isGhost): // En modo fantasma, los datos médicos ya existen; no se editan ?>
             <p style="font-size:.78rem;font-weight:600;color:var(--color-primary);text-transform:uppercase;
                       letter-spacing:.06em;margin-bottom:1rem;">
-                📋 Perfil Médico
+                Perfil Médico
             </p>
 
             <!-- Nombres -->
@@ -190,7 +190,7 @@ $preNid       = $old['nid']       ?? '';
             <!-- Modo fantasma: perfil médico bloqueado (solo lectura) -->
             <p style="font-size:.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;
                       letter-spacing:.06em;margin-bottom:.75rem;">
-                📋 Perfil Médico (datos de DB — no editables aquí)
+                Perfil Médico (datos de DB — no editables aquí)
             </p>
             <!-- Campos hidden para que el servidor reciba los datos del perfil -->
             <input type="hidden" name="primer_nombre"   value="<?= htmlspecialchars($preNombre,    ENT_QUOTES, 'UTF-8') ?>">

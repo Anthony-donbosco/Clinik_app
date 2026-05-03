@@ -79,7 +79,7 @@ $stats = [
 <!-- Tabla global de citas -->
 <div class="card">
     <div class="card-header">
-        <h2 class="card-title">📋 Todas las Citas del Sistema</h2>
+        <h2 class="card-title">Todas las Citas del Sistema</h2>
         <span class="badge badge-primary"><?= count($citas) ?> registro(s)</span>
     </div>
 

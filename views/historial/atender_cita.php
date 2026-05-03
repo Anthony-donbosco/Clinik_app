@@ -14,7 +14,7 @@ unset($_SESSION['flash_error'], $_SESSION['flash_success']);
 
 <!-- ── Topbar ──────────────────────────────────────────────────────── -->
 <header class="topbar">
-    <h1 class="topbar-title">📋 Registrar Historial Médico</h1>
+    <h1 class="topbar-title">Registrar Historial Médico</h1>
     <div class="topbar-actions">
         <a href="<?= $bp ?>/historial" class="btn btn-secondary btn-sm" id="btn-volver-historial">← Volver</a>
         <div class="user-avatar" title="<?= htmlspecialchars($_SESSION['nombre'] ?? '') ?>">
@@ -75,7 +75,7 @@ unset($_SESSION['flash_error'], $_SESSION['flash_success']);
             <div class="card-header" style="cursor:pointer;" id="btn-toggle-historial"
                  onclick="toggleHistorialPrevio()" aria-expanded="false">
                 <h3 class="card-title">
-                    📋 Historial Previo del Paciente
+                    Historial Previo del Paciente
                     <?php if (!empty($historialPrevio)): ?>
                         <span class="badge badge-primary" style="margin-left:.5rem;">
                             <?= count($historialPrevio) ?> consulta(s)
@@ -201,7 +201,7 @@ unset($_SESSION['flash_error'], $_SESSION['flash_success']);
 
                 <!-- Aviso bloqueo -->
                 <div class="alert alert-info" id="alert-bloqueo-aviso">
-                    🔒 <strong>Importante:</strong> Una vez guardado, el historial no podrá modificarse transcurridas 24 horas.
+                    <strong>Importante:</strong> Una vez guardado, el historial no podrá modificarse transcurridas 24 horas.
                 </div>
 
                 <!-- Acciones -->

@@ -83,7 +83,7 @@ function estadoClass(string $estado): string {
         <div class="card" id="card-agenda-hoy" style="grid-column: 1 / -1;">
             <div class="card-header">
                 <h3 class="card-title">📅 Agenda de Hoy — <?= date('d \d\e F \d\e Y') ?></h3>
-                <a href="/citas" class="btn btn-primary btn-sm" id="btn-ver-todas-citas">Ver todas las citas</a>
+                <a href="<?= defined('BASE_PATH') ? BASE_PATH : '' ?>/citas" class="btn btn-primary btn-sm" id="btn-ver-todas-citas">Ver todas las citas</a>
             </div>
 
             <?php if (empty($citas_hoy)): ?>
@@ -119,70 +119,75 @@ function estadoClass(string $estado): string {
             <?php endif; ?>
         </div>
 
-        <!-- ── Lista de Pacientes ──────────────────────────── -->
-        <div class="card" id="card-pacientes">
-            <div class="card-header">
-                <h3 class="card-title">👤 Pacientes Registrados</h3>
-                <span class="badge badge-primary"><?= count($pacientes) ?></span>
+        <!-- ── Contenedor dividido para Pacientes y Doctores ──────────────────────────── -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem; grid-column: 1 / -1;">
+            
+            <!-- ── Lista de Pacientes ──────────────────────────── -->
+            <div class="card" id="card-pacientes" style="margin:0;">
+                <div class="card-header">
+                    <h3 class="card-title">👤 Pacientes Registrados</h3>
+                    <span class="badge badge-primary"><?= count($pacientes) ?></span>
+                </div>
+                <?php if (empty($pacientes)): ?>
+                    <div class="table-empty"><span>👥</span>No hay pacientes registrados.</div>
+                <?php else: ?>
+                <div class="table-wrapper">
+                    <table id="tabla-pacientes">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Identificación</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($pacientes as $p): ?>
+                            <tr>
+                                <td><?= htmlspecialchars(trim($p['nombre_completo'])) ?></td>
+                                <td><code><?= htmlspecialchars($p['numeroIdentificacion']) ?></code></td>
+                                <td><?= htmlspecialchars($p['telefono'] ?? '—') ?></td>
+                                <td><span class="badge estado-activo"><?= htmlspecialchars($p['estado']) ?></span></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php endif; ?>
             </div>
-            <?php if (empty($pacientes)): ?>
-                <div class="table-empty"><span>👥</span>No hay pacientes registrados.</div>
-            <?php else: ?>
-            <div class="table-wrapper">
-                <table id="tabla-pacientes">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Identificación</th>
-                            <th>Teléfono</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($pacientes as $p): ?>
-                        <tr>
-                            <td><?= htmlspecialchars(trim($p['nombre_completo'])) ?></td>
-                            <td><code><?= htmlspecialchars($p['numeroIdentificacion']) ?></code></td>
-                            <td><?= htmlspecialchars($p['telefono'] ?? '—') ?></td>
-                            <td><span class="badge estado-activo"><?= htmlspecialchars($p['estado']) ?></span></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-            <?php endif; ?>
-        </div>
 
-        <!-- ── Lista de Doctores ───────────────────────────── -->
-        <div class="card" id="card-doctores">
-            <div class="card-header">
-                <h3 class="card-title">🩺 Doctores del Personal</h3>
-                <span class="badge badge-primary"><?= count($doctores) ?></span>
+            <!-- ── Lista de Doctores ───────────────────────────── -->
+            <div class="card" id="card-doctores" style="margin:0;">
+                <div class="card-header">
+                    <h3 class="card-title">🩺 Doctores del Personal</h3>
+                    <span class="badge badge-primary"><?= count($doctores) ?></span>
+                </div>
+                <?php if (empty($doctores)): ?>
+                    <div class="table-empty"><span>🏥</span>No hay doctores registrados.</div>
+                <?php else: ?>
+                <div class="table-wrapper">
+                    <table id="tabla-doctores">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Especialidad</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($doctores as $d): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($d['nombre_completo']) ?></td>
+                                <td><span class="badge badge-primary"><?= htmlspecialchars($d['especialidad']) ?></span></td>
+                                <td><span class="badge estado-activo"><?= htmlspecialchars($d['estado']) ?></span></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php endif; ?>
             </div>
-            <?php if (empty($doctores)): ?>
-                <div class="table-empty"><span>🏥</span>No hay doctores registrados.</div>
-            <?php else: ?>
-            <div class="table-wrapper">
-                <table id="tabla-doctores">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Especialidad</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($doctores as $d): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($d['nombre_completo']) ?></td>
-                            <td><span class="badge badge-primary"><?= htmlspecialchars($d['especialidad']) ?></span></td>
-                            <td><span class="badge estado-activo"><?= htmlspecialchars($d['estado']) ?></span></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-            <?php endif; ?>
+
         </div>
 
     </section>

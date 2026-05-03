@@ -33,18 +33,20 @@ class FacturaController extends BaseController
         $flashError = $_SESSION['flash_error'] ?? null;
         unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
 
+        $fechaFiltro = $_GET['fecha'] ?? date('Y-m-d');
+
         if ($idRol === 3) {
             // Secretaria — ve todas las facturas y puede crear nuevas
-            $facturas       = $this->repo->getAllFacturas();
+            $facturas       = $this->repo->getAllFacturas(150, $fechaFiltro);
             $citasSinFactura = $this->repo->getCitasSinFactura();
-            $this->render('facturas/index', compact('facturas', 'citasSinFactura', 'bp', 'flashOk', 'flashError'));
+            $this->render('facturas/index', compact('facturas', 'citasSinFactura', 'bp', 'flashOk', 'flashError', 'fechaFiltro'));
 
         } elseif ($idRol === 1) {
             // Paciente — ve solo sus propias facturas
             $idPaciente = (int) ($_SESSION['id_referencia'] ?? 0);
-            $facturas   = $this->repo->getFacturasByPaciente($idPaciente);
+            $facturas   = $this->repo->getFacturasByPaciente($idPaciente, 150, $fechaFiltro);
             $citasSinFactura = [];
-            $this->render('facturas/index', compact('facturas', 'citasSinFactura', 'bp', 'flashOk', 'flashError'));
+            $this->render('facturas/index', compact('facturas', 'citasSinFactura', 'bp', 'flashOk', 'flashError', 'fechaFiltro'));
 
         } else {
             // Doctor o Admin — no tienen acceso al módulo de facturas

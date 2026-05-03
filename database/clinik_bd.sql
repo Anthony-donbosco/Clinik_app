@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 02, 2026 at 09:35 PM
+-- Generation Time: May 03, 2026 at 02:59 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -62,7 +62,17 @@ INSERT INTO `cita` (`id_cita`, `id_doctor`, `id_paciente`, `fecha`, `hora`, `id_
 (19, 13, 19, '2026-05-13', '11:00:00', 4),
 (20, 14, 20, '2026-05-13', '11:30:00', 4),
 (21, 10, 1, '2026-05-06', '10:00:00', 4),
-(22, 14, 2, '2026-04-30', '09:30:00', 1);
+(22, 14, 2, '2026-04-30', '09:30:00', 2),
+(23, 1, 13, '2026-05-08', '12:30:00', 4),
+(24, 1, 3, '2026-05-06', '08:30:00', 2),
+(25, 1, 5, '2026-05-04', '08:30:00', 4),
+(26, 1, 5, '2026-05-07', '10:00:00', 2),
+(27, 1, 5, '2026-05-04', '09:30:00', 4),
+(28, 14, 5, '2026-05-04', '08:30:00', 4),
+(29, 14, 1, '2026-05-07', '11:30:00', 1),
+(30, 8, 1, '2026-05-06', '09:00:00', 4),
+(31, 1, 1, '2026-05-05', '09:00:00', 1),
+(32, 2, 5, '2026-05-08', '13:00:00', 4);
 
 -- --------------------------------------------------------
 
@@ -101,7 +111,13 @@ INSERT INTO `diagnostico` (`id_diagnostico`, `id_historial`, `descripcion`) VALU
 (18, 18, 'Resfriado común, congestión nasal severa.'),
 (19, 19, 'Reacción alérgica cutánea por contacto.'),
 (20, 20, 'Esguince de tobillo grado 1 por contusión física.'),
-(21, 21, 'tienes cancer andy');
+(21, 21, 'tienes cancer andy'),
+(22, 22, 'pruebadenoti'),
+(23, 23, 'tienes cancer andi'),
+(24, 24, 'ya no hay nada que hacer'),
+(25, 25, 'pruebas_noti_sec'),
+(26, 26, 'sfcsdedsefsefes'),
+(27, 27, 'ultimaprueba');
 
 -- --------------------------------------------------------
 
@@ -144,7 +160,8 @@ INSERT INTO `doctor` (`id_doctor`, `primer_nombre`, `segundo_nombre`, `primer_ap
 (17, 'Miranda', 'Sofía', 'Serrano', 'Luz', 'Ginecología', 8, '2026-04-29 06:01:07'),
 (18, 'Juan', 'Carlos', 'Rivas', 'Cruz', 'Medicina General', 8, '2026-04-29 06:01:07'),
 (19, 'Mario', 'Alberto', 'Mejía', 'Bueno', 'Oftalmología', 8, '2026-04-29 06:01:07'),
-(20, 'Luis', 'Fernando', 'Pérez', 'Díaz', 'Pediatría', 8, '2026-04-29 06:01:07');
+(20, 'Luis', 'Fernando', 'Pérez', 'Díaz', 'Pediatría', 8, '2026-04-29 06:01:07'),
+(21, 'elmer', 'eduardo', 'rivas', 'aviles', 'Traumatología', 8, '2026-05-02 20:39:40');
 
 -- --------------------------------------------------------
 
@@ -210,7 +227,9 @@ INSERT INTO `factura` (`id_factura`, `id_cita`, `fecha`, `detalle`, `monto`) VAL
 (17, 17, '2026-05-13', 'Consulta Especialidad Dermatología', 40.00),
 (18, 18, '2026-05-13', 'Consulta Medicina General', 25.00),
 (19, 19, '2026-05-13', 'Consulta Especialidad Cardiología', 50.00),
-(20, 20, '2026-05-13', 'Consulta Especialidad Nutrición', 30.00);
+(20, 20, '2026-05-13', 'Consulta Especialidad Nutrición', 30.00),
+(21, 21, '2026-05-02', 'Consulta Especialidad Pediatría', 400.00),
+(22, 25, '2026-05-02', 'Consulta Especialidad Medicina General', 10.00);
 
 -- --------------------------------------------------------
 
@@ -250,7 +269,13 @@ INSERT INTO `historial` (`id_historial`, `id_paciente`, `id_cita`, `fecha`) VALU
 (18, 18, 18, '2026-05-13'),
 (19, 19, 19, '2026-05-13'),
 (20, 20, 20, '2026-05-13'),
-(21, 1, 21, '2026-04-30');
+(21, 1, 21, '2026-04-30'),
+(22, 13, 23, '2026-05-02'),
+(23, 5, 25, '2026-05-02'),
+(24, 5, 28, '2026-05-02'),
+(25, 1, 30, '2026-05-02'),
+(26, 5, 27, '2026-05-02'),
+(27, 5, 32, '2026-05-02');
 
 -- --------------------------------------------------------
 
@@ -295,7 +320,8 @@ INSERT INTO `paciente` (`id_paciente`, `primer_nombre`, `segundo_nombre`, `prime
 (17, 'Zaira', 'Valentina', 'Díaz', 'López', '7000-0017', '1999-11-11', '00000017-7', 8, '2026-04-29 06:01:07'),
 (18, 'Ángel', 'Gabriel', 'Cruz', 'Pérez', '7000-0018', '1991-02-02', '00000018-8', 8, '2026-04-29 06:01:07'),
 (19, 'Berta', 'Luz', 'Sosa', 'Sosa', '7000-0019', '1984-06-06', '00000019-9', 8, '2026-04-29 06:01:07'),
-(20, 'César', 'Augusto', 'Polo', 'Hernández', '7000-0020', '1978-08-08', '00000020-0', 8, '2026-04-29 06:01:07');
+(20, 'César', 'Augusto', 'Polo', 'Hernández', '7000-0020', '1978-08-08', '00000020-0', 8, '2026-04-29 06:01:07'),
+(21, 'Rene', NULL, 'Tejada', NULL, '+503 70708080', '1990-01-01', '12345678-9', 8, '2026-05-03 00:28:29');
 
 -- --------------------------------------------------------
 
@@ -334,7 +360,13 @@ INSERT INTO `receta` (`id_receta`, `id_historial`, `indicaciones`) VALUES
 (18, 18, 'Loratadina 10mg diaria por 5 días.'),
 (19, 19, 'Desloratadina 5mg diaria por 7 días.'),
 (20, 20, 'Diclofenaco gel al 1% aplicar en zona afectada 3 veces al día.'),
-(21, 21, 'yiyis');
+(21, 21, 'yiyis'),
+(22, 22, 'pruebadenoti'),
+(23, 23, 'reposo'),
+(24, 24, 'reposo'),
+(25, 25, 'oseijac'),
+(26, 26, 'sefsef'),
+(27, 27, 'ultimaprueba');
 
 -- --------------------------------------------------------
 
@@ -394,7 +426,13 @@ INSERT INTO `tratamiento` (`id_tratamiento`, `id_historial`, `descripcion`) VALU
 (18, 18, 'Inhalaciones de vapor y reposo por 48 horas.'),
 (19, 19, 'Evitar contacto con alérgenos identificados.'),
 (20, 20, 'Aplicación de hielo local y uso de vendaje compresivo.'),
-(21, 21, 'no mas');
+(21, 21, 'no mas'),
+(22, 22, 'pruebadenoti'),
+(23, 23, 'yiyis'),
+(24, 24, 'reposo'),
+(25, 25, 'oaieuja'),
+(26, 26, 'sefsef'),
+(27, 27, 'ultimaprueba');
 
 -- --------------------------------------------------------
 
@@ -421,7 +459,7 @@ CREATE TABLE `usuarios` (
 
 INSERT INTO `usuarios` (`id_usuario`, `nombre`, `apellido`, `correo`, `numero_identificacion`, `contrasena_hash`, `id_rol`, `id_referencia`, `id_estado`, `fecha_creacion`) VALUES
 (1, 'Ana', 'González', 'secretaria@clinik.com', 'SEC-001', '$2y$12$g5IuRpEX6ajS3.6f4t6FieVbblDfvm8XvvF/Zz7MUl9qsG358rpri', 3, NULL, 8, '2026-04-29 07:22:31'),
-(2, 'Roberto', 'Salazar', 'rsalazar@clinik.com', 'DOC-001', '$2y$12$g5IuRpEX6ajS3.6f4t6FieVbblDfvm8XvvF/Zz7MUl9qsG358rpri', 2, 1, 8, '2026-04-29 07:22:31'),
+(2, 'Roberto Antonio', 'Salazar Méndez', 'rsalazar@clinik.com', 'DOC-001', '$2y$12$g5IuRpEX6ajS3.6f4t6FieVbblDfvm8XvvF/Zz7MUl9qsG358rpri', 2, 1, 8, '2026-04-29 07:22:31'),
 (3, 'Elena', 'Cruz', 'ecruz@clinik.com', 'DOC-002', '$2y$12$g5IuRpEX6ajS3.6f4t6FieVbblDfvm8XvvF/Zz7MUl9qsG358rpri', 2, 2, 8, '2026-04-29 07:22:31'),
 (4, 'Mauricio', 'Rivas', 'mrivas@clinik.com', 'DOC-003', '$2y$12$g5IuRpEX6ajS3.6f4t6FieVbblDfvm8XvvF/Zz7MUl9qsG358rpri', 2, 3, 8, '2026-04-29 07:22:31'),
 (5, 'Génesis', 'Mejía', 'gmejia@clinik.com', 'DOC-004', '$2y$12$g5IuRpEX6ajS3.6f4t6FieVbblDfvm8XvvF/Zz7MUl9qsG358rpri', 2, 4, 8, '2026-04-29 07:22:31'),
@@ -432,7 +470,25 @@ INSERT INTO `usuarios` (`id_usuario`, `nombre`, `apellido`, `correo`, `numero_id
 (10, 'Lucía', 'Ramos', 'lramos@mail.com', '00000004-4', '$2y$12$g5IuRpEX6ajS3.6f4t6FieVbblDfvm8XvvF/Zz7MUl9qsG358rpri', 1, 4, 8, '2026-04-29 07:22:31'),
 (11, 'Jorge', 'Ortiz', 'jortiz@mail.com', '00000005-5', '$2y$12$g5IuRpEX6ajS3.6f4t6FieVbblDfvm8XvvF/Zz7MUl9qsG358rpri', 1, 5, 8, '2026-04-29 07:22:31'),
 (12, 'Super', 'Admin', 'admin@clinik.com', 'ADMIN-001', '$2y$12$U7Ac/LZVnOgH8uBVaswGXePsG/iMAmkxOciuYRCFlKlhSxPKr402i', 4, NULL, 8, '2026-04-30 01:00:11'),
-(13, 'Johana', 'López', 'jlopez.doc@clinik.com', 'DOC-010', '$2y$12$g5IuRpEX6ajS3.6f4t6FieVbblDfvm8XvvF/Zz7MUl9qsG358rpri', 2, 10, 8, '2026-04-30 06:20:48');
+(13, 'Johana', 'López', 'jlopez.doc@clinik.com', 'DOC-010', '$2y$12$g5IuRpEX6ajS3.6f4t6FieVbblDfvm8XvvF/Zz7MUl9qsG358rpri', 2, 10, 8, '2026-04-30 06:20:48'),
+(14, 'PRUEBA', 'prueb', 'secretaria@gmail.com', 'SEC-202', '$2y$12$/8BgJgc1HAdEwRRvDMG5dOJ7yAetg9BQKxMNvYHZcjtA.RifvVCXW', 3, NULL, 8, '2026-05-02 20:08:28'),
+(15, 'Pruebas', 'pruebas', 'admin@gmail.com', 'ADMIN-202', '$2y$12$8AIgnx9Ak78IGqoyNPRGJOCQkxDa4TAQINntul71F/KnO8mYkRuvi', 4, NULL, 8, '2026-05-02 20:11:22'),
+(16, 'elmer eduardo', 'rivas aviles', 'elmer@doctor.com', 'DOC-707', '$2y$12$ohppdiMLL8D9ULCN3egoMuWVw7xO.X9UGbfemDGF8tzUpyBCf5qtK', 2, 21, 8, '2026-05-02 20:39:40'),
+(17, 'Mario Alberto', 'Mejía Bueno', 'mario@gmail.com', 'DOC-019', '$2y$12$q/GpCTSJqSxmkhsNGK8iTuBxPB3bXq0NiShVx3A0NJbBFxZi2tVq.', 2, 19, 8, '2026-05-02 21:12:06'),
+(18, 'Elmer Eduardo', 'Avilés Pérez', 'elmer@prueba.com', 'DOC-007', '$2y$12$geSV.PZH0YtelEYAvzdIveAZtUCvcpxkHTb./ohyIqKuI.kgL.l46', 2, 7, 8, '2026-05-02 21:13:07'),
+(19, 'Victoria Isabel', 'García Mares', 'victoria@gmail.com', 'DOC-014', '$2y$12$1zj.JwQR8YvDrpQvrGUuZ.xGiTYUOU5egwKd75svdxMOuo0qq.HUS', 2, 14, 8, '2026-05-02 21:13:22'),
+(20, 'Alexander David', 'Hernández Ortiz', 'alexander@gmail.com', 'DOC-013', '$2y$12$Q70dzBrOp7jEU5DGTcQt9euIRbxRuKt/zqDDmRMp0jGoXUsb6Z8pm', 2, 13, 8, '2026-05-02 21:13:43'),
+(21, 'Carlos Daniel', 'Monterrosa Luna', 'carlos@gmail.com', 'DOC-008', '$2y$12$56vV.8/qiXdNu/jYbLL5Y.ZRdY3F8MREvJorUS0mXhyPjW9vobioG', 2, 8, 8, '2026-05-02 21:14:00'),
+(22, 'Valerie Nicole', 'Pérez Sosa', 'valerie@gmail.com', 'DOC-011', '$2y$12$Fxnky30R.WjlqY4ltOb6HO2xaviMZwapgJELqV1k4Q8hsz.NHMju6', 2, 11, 8, '2026-05-02 21:14:56'),
+(23, 'Luis Fernando', 'Pérez Díaz', 'luis@gmail.com', 'DOC-020', '$2y$12$Niqi9IVqCqo3Cgfiz8tj.u4KhDHJaekb2S.eIe7kBwMEDNO5dc.ki', 2, 20, 8, '2026-05-02 21:15:14'),
+(24, 'Eduardo Luis', 'Ríos Sol', 'eduardo@gmail.com', 'DOC-015', '$2y$12$K3UyDpLRPi2MsjtEOl6j6eVV7.JWVLoK5f7Z/nWJHBaBvJFoNR5qy', 2, 15, 8, '2026-05-02 21:15:29'),
+(25, 'Juan Carlos', 'Rivas Cruz', 'juan@gmail.com', 'DOC-018', '$2y$12$rTxdZMKI19261qyko0lD3eS.Q/58gObhF4Kh6Rs86GB39ZGxCr8ha', 2, 18, 8, '2026-05-02 21:15:46'),
+(26, 'Diego Andrés', 'Rivera Gómez', 'diego@gmail.com', 'DOC-009', '$2y$12$AfCRy.kt9t30mLUs9ieKhuNbD.YW7sPmbvvTCLC5KnyXtcjwwFIt2', 2, 9, 8, '2026-05-02 21:16:00'),
+(27, 'Lorena Giselle', 'Serrano Majano', 'lorena@gmail.com', 'DOC-006', '$2y$12$ZsoEjUQ.r1cHwusbvyuspeb62oiUADiVNOnEFSpxaQeP85wnilDV6', 2, 6, 8, '2026-05-02 21:16:27'),
+(28, 'Miranda Sofía', 'Serrano Luz', 'mirandasofia@gmail.com', 'DOC-017', '$2y$12$OYVgRO46wSrTcR8YzTUOXOulZCDDp1UZvjq8vYEAHp8q/Wi8aOVoK', 2, 17, 8, '2026-05-02 21:16:48'),
+(29, 'Antonio José', 'Sosa Hernández', 'antonio@gmail.com', 'DOC-012', '$2y$12$zVqWoJScibQTLP0GtwXcVexK8qYSy92NZcz2Bh.ql60EHV7lkQJCK', 2, 12, 8, '2026-05-02 21:17:17'),
+(30, 'Giselle María', 'Torres Paz', 'giselle@gmail.com', 'DOC-016', '$2y$12$ZI.xmSjM/RrFIpMqCW.fpeKuqiNlAiNAozMk7feabsuX6ATk044iG', 2, 16, 8, '2026-05-02 21:17:33'),
+(31, 'Rene', 'Tejada', 'rene.tejada@gmail.com', '12345678-9', '$2y$12$UFPIiu/o7yyWqndcZK1Qy.4Ez02pmqKKrVpsSOc.HQzeiP2jlMW8m', 1, 21, 8, '2026-05-03 00:28:29');
 
 --
 -- Indexes for dumped tables
@@ -528,55 +584,55 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT for table `cita`
 --
 ALTER TABLE `cita`
-  MODIFY `id_cita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_cita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `diagnostico`
 --
 ALTER TABLE `diagnostico`
-  MODIFY `id_diagnostico` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_diagnostico` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `doctor`
 --
 ALTER TABLE `doctor`
-  MODIFY `id_doctor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_doctor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `factura`
 --
 ALTER TABLE `factura`
-  MODIFY `id_factura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_factura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `historial`
 --
 ALTER TABLE `historial`
-  MODIFY `id_historial` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_historial` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `paciente`
 --
 ALTER TABLE `paciente`
-  MODIFY `id_paciente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_paciente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `receta`
 --
 ALTER TABLE `receta`
-  MODIFY `id_receta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_receta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `tratamiento`
 --
 ALTER TABLE `tratamiento`
-  MODIFY `id_tratamiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_tratamiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- Constraints for dumped tables

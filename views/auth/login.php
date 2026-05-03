@@ -239,7 +239,7 @@
                     id="credencial"
                     name="credencial"
                     class="form-input"
-                    placeholder="123456789 o correo@ejemplo.com"
+                    placeholder="00000001-1 o correo@ejemplo.com"
                     autocomplete="username"
                     required
                 >

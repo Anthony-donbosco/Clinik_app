@@ -26,8 +26,9 @@ class FacturaRepository
     /**
      * Todas las facturas del sistema (para Secretaria).
      */
-    public function getAllFacturas(int $limite = 50): array
+    public function getAllFacturas(int $limite = 150, string $fecha = ''): array
     {
+        $fechaCond = $fecha ? "WHERE f.fecha = :fecha" : "";
         $sql = "SELECT f.id_factura, f.fecha, f.detalle, f.monto,
                        c.fecha AS fecha_cita, c.hora AS hora_cita,
                        CONCAT(p.primer_nombre, ' ', p.primer_apellido) AS nombre_paciente,
@@ -38,10 +39,12 @@ class FacturaRepository
                 INNER JOIN cita    c ON f.id_cita    = c.id_cita
                 INNER JOIN paciente p ON c.id_paciente = p.id_paciente
                 INNER JOIN doctor   d ON c.id_doctor   = d.id_doctor
-                ORDER  BY f.fecha DESC, f.id_factura DESC
+                $fechaCond
+                ORDER  BY f.id_factura DESC
                 LIMIT  :limite";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        if ($fecha) $stmt->bindValue(':fecha', $fecha);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -49,8 +52,9 @@ class FacturaRepository
     /**
      * Facturas de un paciente específico (para vista del Paciente).
      */
-    public function getFacturasByPaciente(int $idPaciente, int $limite = 20): array
+    public function getFacturasByPaciente(int $idPaciente, int $limite = 150, string $fecha = ''): array
     {
+        $fechaCond = $fecha ? "AND f.fecha = :fecha" : "";
         $sql = "SELECT f.id_factura, f.fecha, f.detalle, f.monto,
                        c.fecha AS fecha_cita, c.hora AS hora_cita,
                        CONCAT(d.primer_nombre, ' ', d.primer_apellido) AS nombre_doctor,
@@ -58,12 +62,13 @@ class FacturaRepository
                 FROM   factura f
                 INNER JOIN cita    c ON f.id_cita   = c.id_cita
                 INNER JOIN doctor  d ON c.id_doctor = d.id_doctor
-                WHERE  c.id_paciente = :id
-                ORDER  BY f.fecha DESC, f.id_factura DESC
+                WHERE  c.id_paciente = :id $fechaCond
+                ORDER  BY f.id_factura DESC
                 LIMIT  :limite";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id',     $idPaciente, PDO::PARAM_INT);
         $stmt->bindValue(':limite', $limite,      PDO::PARAM_INT);
+        if ($fecha) $stmt->bindValue(':fecha', $fecha);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

@@ -21,8 +21,13 @@ function estadoCitaClass(string $estado): string {
 ?>
 <style>
     /* ── Formulario de nueva cita ──────────────────────────── */
-    .form-cita { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-    @media (max-width: 640px) { .form-cita { grid-template-columns: 1fr; } }
+    .form-cita { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+
+    @media (min-width: 1024px) {
+        .custom-layout {
+            grid-template-columns: 320px 1fr !important;
+        }
+    }
 
     .form-group label {
         display: block;
@@ -133,7 +138,7 @@ function estadoCitaClass(string $estado): string {
         </div>
     <?php endif; ?>
 
-    <div class="content-grid" style="align-items: start;">
+    <div class="content-grid custom-layout" style="align-items: start;">
 
         <!-- ════════════════════════════════════════════════
              FORMULARIO NUEVA CITA (Secretaria y Paciente)
@@ -216,11 +221,18 @@ function estadoCitaClass(string $estado): string {
              TABLA DE CITAS (todos los roles)
         ═══════════════════════════════════════════════════ -->
         <div class="card" id="card-listado-citas" <?= $idRol === 2 ? 'style="grid-column:1/-1"' : '' ?>>
-            <div class="card-header">
+            <div class="card-header" style="flex-wrap:wrap; gap:1rem;">
                 <h2 class="card-title">
-                    <?= match($idRol) { 2 => '🗓 Mi Agenda', 1 => '📋 Mis Citas', default => '📋 Todas las Citas' } ?>
+                    <?= match($idRol) { 2 => '🗓 Mi Agenda', 1 => 'Mis Citas', default => 'Todas las Citas' } ?>
                 </h2>
-                <span class="badge badge-primary"><?= count($citas) ?> registro(s)</span>
+                <div style="display:flex; gap:.75rem; align-items:center; flex-wrap:wrap;">
+                    <form method="GET" action="<?= defined('BASE_PATH') ? BASE_PATH : '' ?>/citas" style="display:flex; gap:.5rem; align-items:center;">
+                        <input type="date" name="fecha" value="<?= htmlspecialchars($fechaFiltro) ?>" class="form-control" style="padding:.4rem; width:auto; font-size:.85rem;">
+                        <button type="submit" class="btn btn-secondary btn-sm">Filtrar</button>
+                        <a href="<?= defined('BASE_PATH') ? BASE_PATH : '' ?>/citas?fecha=" class="btn btn-secondary btn-sm" title="Ver todas">Todas</a>
+                    </form>
+                    <span class="badge badge-primary"><?= count($citas) ?> registro(s)</span>
+                </div>
             </div>
 
             <?php if (empty($citas)): ?>
@@ -310,7 +322,6 @@ function estadoCitaClass(string $estado): string {
     (function () {
         'use strict';
 
-        // PASO CLAVE: Usamos la variable global definida en foot.php
         const BASE_URL = window.CLINIK_BASE_URL || '/clinik_app';
 
         const selectDoctor = document.getElementById('select-doctor');
@@ -490,6 +501,55 @@ function estadoCitaClass(string $estado): string {
                 [btnAp, btnRec, btnCan].forEach(b => { if (b) { b.disabled = false; b.style.opacity = '1'; } });
             });
         };
+
+        // Paginación de citas
+        const tbody = document.querySelector('#tabla-citas tbody');
+        if (tbody) {
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const rowsPerPage = 15;
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            if (totalPages > 1) {
+                const paginationControls = document.createElement('div');
+                paginationControls.className = 'pagination-controls';
+                paginationControls.style.display = 'flex';
+                paginationControls.style.justifyContent = 'center';
+                paginationControls.style.gap = '.5rem';
+                paginationControls.style.marginTop = '1rem';
+
+                function renderPage(page) {
+                    rows.forEach((row, index) => {
+                        row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? '' : 'none';
+                    });
+                    
+                    paginationControls.innerHTML = '';
+                    
+                    const btnPrev = document.createElement('button');
+                    btnPrev.className = 'btn btn-secondary btn-sm';
+                    btnPrev.textContent = '« Ant';
+                    btnPrev.disabled = page === 1;
+                    btnPrev.onclick = () => renderPage(page - 1);
+                    paginationControls.appendChild(btnPrev);
+                    
+                    const span = document.createElement('span');
+                    span.style.padding = '0.3rem 0.75rem';
+                    span.style.fontSize = '0.85rem';
+                    span.style.color = 'var(--text-secondary)';
+                    span.textContent = `Pág ${page} de ${totalPages}`;
+                    paginationControls.appendChild(span);
+                    
+                    const btnNext = document.createElement('button');
+                    btnNext.className = 'btn btn-secondary btn-sm';
+                    btnNext.textContent = 'Sig »';
+                    btnNext.disabled = page === totalPages;
+                    btnNext.onclick = () => renderPage(page + 1);
+                    paginationControls.appendChild(btnNext);
+                }
+
+                document.querySelector('#card-listado-citas .table-wrapper').after(paginationControls);
+                renderPage(1);
+            }
+        }
     })();
 </script>
 

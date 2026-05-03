@@ -65,7 +65,7 @@ $idUsuario = (int) ($doctor['id_usuario'] ?? 0);
         <!-- ── Perfil Médico ── -->
         <p style="font-size:.78rem;font-weight:600;color:var(--color-primary);text-transform:uppercase;
                   letter-spacing:.06em;margin-bottom:1rem;">
-            📋 Perfil Médico
+            Perfil Médico
         </p>
 
         <!-- Nombres -->

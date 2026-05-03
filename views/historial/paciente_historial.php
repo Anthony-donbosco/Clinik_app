@@ -10,7 +10,7 @@ include __DIR__ . '/../layout/head.php';
 
 <!-- ── Topbar ──────────────────────────────────────────────────────── -->
 <header class="topbar no-print">
-    <h1 class="topbar-title">📋 Mi Historial Médico</h1>
+    <h1 class="topbar-title">Mi Historial Médico</h1>
     <div class="topbar-actions">
         <button onclick="window.print()" class="btn btn-secondary btn-sm" id="btn-imprimir-historial"
                 title="Imprimir o guardar como PDF">
@@ -250,9 +250,30 @@ include __DIR__ . '/../layout/head.php';
 
 /* ── Estilos de Impresion (Diagrama 7 Paso 9) ─────────── */
 @media print {
+    @page { margin: 1.5cm; }
+    
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        background: white !important;
+    }
+
+    .app-layout, .main-content, #paciente-historial-page {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    #paciente-historial-page {
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+
     .sidebar, .no-print, .topbar-actions { display: none !important; }
-    .page-content { margin-left: 0 !important; padding: 1rem !important; }
-    .stats-grid { display: none; }
+    .stats-grid { display: none !important; }
 
     /* Cabecera institucional */
     body::before {

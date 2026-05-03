@@ -41,20 +41,22 @@ class CitaController extends BaseController
         $flashError  = $_SESSION['flash_error'] ?? null;
         unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
 
+        $fechaFiltro = $_GET['fecha'] ?? date('Y-m-d');
+
         switch ($idRol) {
             case 3: // Secretaria — ve todo y puede crear citas para cualquiera
-                $citas    = $this->repo->getAllCitas();
+                $citas    = $this->repo->getAllCitas(150, 0, $fechaFiltro);
                 $pacientes = $this->repo->getPacientesParaSelect();
                 break;
             case 2: // Doctor — ve solo sus propias citas
-                $citas = $this->repo->getCitasByDoctor($idRef);
+                $citas = $this->repo->getCitasByDoctor($idRef, 150, $fechaFiltro);
                 break;
             case 1: // Paciente — ve sus citas y puede solicitar nuevas
-                $citas = $this->repo->getCitasByPaciente($idRef);
+                $citas = $this->repo->getCitasByPaciente($idRef, 150, $fechaFiltro);
                 break;
         }
 
-        $this->render('citas/index', compact('citas', 'doctores', 'pacientes', 'flashOk', 'flashError'));
+        $this->render('citas/index', compact('citas', 'doctores', 'pacientes', 'flashOk', 'flashError', 'fechaFiltro'));
     }
 
     /** POST /citas/crear — Procesa el formulario de nueva cita */

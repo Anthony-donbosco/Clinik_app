@@ -128,4 +128,72 @@ class HistorialController extends BaseController
         }
         exit;
     }
+
+    // ──────────────────────────────────────────────────────────────────────
+    //  GET /historial/editar?id=ID
+    // ──────────────────────────────────────────────────────────────────────
+
+    /**
+     * Muestra el formulario para que el Doctor edite un historial existente (antes de 24h).
+     */
+    public function editar(): void
+    {
+        $this->requireRole(2); // Solo Doctor
+
+        $idHistorial = (int) ($_GET['id'] ?? 0);
+        $idDoctor    = (int) ($_SESSION['id_referencia'] ?? 0);
+        $bp          = defined('BASE_PATH') ? BASE_PATH : '';
+
+        if ($idHistorial <= 0) {
+            $_SESSION['flash_error'] = 'Historial no especificado.';
+            header('Location: ' . $bp . '/historial');
+            exit;
+        }
+
+        $resultado = $this->service->getHistorialParaEditar($idHistorial, $idDoctor);
+
+        if (!$resultado['ok']) {
+            $_SESSION['flash_error'] = $resultado['mensaje'];
+            header('Location: ' . $bp . '/historial');
+            exit;
+        }
+
+        $historial = $resultado['historial'];
+
+        $this->render('historial/editar_historial', compact('historial', 'bp'));
+    }
+
+    // ──────────────────────────────────────────────────────────────────────
+    //  POST /historial/actualizar
+    // ──────────────────────────────────────────────────────────────────────
+
+    /**
+     * Procesa la actualizacion de un historial medico.
+     */
+    public function actualizar(): void
+    {
+        $this->requireRole(2);
+
+        $bp       = defined('BASE_PATH') ? BASE_PATH : '';
+        $idDoctor = (int) ($_SESSION['id_referencia'] ?? 0);
+
+        $data = [
+            'id_historial' => (int) ($_POST['id_historial'] ?? 0),
+            'id_doctor'    => $idDoctor,
+            'diagnostico'  => $_POST['diagnostico'] ?? '',
+            'tratamiento'  => $_POST['tratamiento'] ?? '',
+            'notas'        => $_POST['notas']       ?? '',
+        ];
+
+        $resultado = $this->service->actualizarHistorial($data);
+
+        if ($resultado['ok']) {
+            $_SESSION['flash_success'] = $resultado['mensaje'];
+            header('Location: ' . $bp . '/historial');
+        } else {
+            $_SESSION['flash_error'] = $resultado['mensaje'];
+            header('Location: ' . $bp . '/historial/editar?id=' . $data['id_historial']);
+        }
+        exit;
+    }
 }

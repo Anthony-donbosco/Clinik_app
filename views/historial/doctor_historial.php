@@ -14,7 +14,7 @@ unset($_SESSION['flash_error'], $_SESSION['flash_success']);
 
 <!-- ── Topbar ──────────────────────────────────────────────────────── -->
 <header class="topbar">
-    <h1 class="topbar-title">📋 Historiales Médicos</h1>
+    <h1 class="topbar-title">Historiales Médicos</h1>
     <div class="topbar-actions">
         <a href="<?= $bp ?>/citas" class="btn btn-primary btn-sm" id="btn-ir-agenda">
             📅 Mi Agenda
@@ -105,6 +105,15 @@ unset($_SESSION['flash_error'], $_SESSION['flash_success']);
                                         data-registrado="<?= date('d/m/Y H:i', strtotime($h['fecha_registro'])) ?>">
                                     🔍 Ver
                                 </button>
+                                <?php
+                                $tiempoTranscurrido = time() - strtotime($h['fecha_registro']);
+                                $horasPermitidas = 24 * 3600;
+                                if ($tiempoTranscurrido <= $horasPermitidas):
+                                ?>
+                                    <a href="<?= $bp ?>/historial/editar?id=<?= (int) $h['id_historial'] ?>" class="btn btn-secondary btn-sm" title="Editar antes de 24h">
+                                        ✏️ Editar
+                                    </a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -121,7 +130,7 @@ unset($_SESSION['flash_error'], $_SESSION['flash_success']);
 <div class="modal-overlay" id="modal-detalle-historial" role="dialog" aria-modal="true" aria-labelledby="modal-historial-title" style="display:none">
     <div class="modal-box" id="modal-historial-box">
         <div class="modal-header">
-            <h3 class="modal-title" id="modal-historial-title">📋 Detalle de Consulta</h3>
+            <h3 class="modal-title" id="modal-historial-title">Detalle de Consulta</h3>
             <button class="modal-close" id="btn-cerrar-modal-historial" onclick="cerrarModal()" aria-label="Cerrar">✕</button>
         </div>
         <div class="modal-body" id="modal-historial-body">

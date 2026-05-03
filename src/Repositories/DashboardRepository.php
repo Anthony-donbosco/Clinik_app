@@ -95,10 +95,10 @@ class DashboardRepository
     public function getStatsDoctor(int $idDoctor): array
     {
         $sql = "SELECT
-                    SUM(CASE WHEN fecha = CURDATE() AND id_estado != 5 THEN 1 ELSE 0 END) AS hoy,
-                    SUM(CASE WHEN id_estado = 1 THEN 1 ELSE 0 END)                         AS pendientes,
+                    SUM(CASE WHEN fecha = CURDATE() AND id_estado IN (2,4) THEN 1 ELSE 0 END) AS hoy,
+                    SUM(CASE WHEN id_estado = 2 THEN 1 ELSE 0 END)                         AS pendientes,
                     SUM(CASE WHEN id_estado = 4 THEN 1 ELSE 0 END)                         AS atendidas,
-                    SUM(CASE WHEN fecha >= CURDATE() AND id_estado = 1 THEN 1 ELSE 0 END)  AS proximas
+                    SUM(CASE WHEN fecha >= CURDATE() AND id_estado = 2 THEN 1 ELSE 0 END)  AS proximas
                 FROM cita
                 WHERE id_doctor = :id";
         $stmt = $this->db->prepare($sql);
@@ -118,7 +118,7 @@ class DashboardRepository
                 INNER JOIN estado   e ON c.id_estado   = e.id_estado
                 WHERE  c.id_doctor = :id
                 AND    c.fecha BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
-                AND    c.id_estado NOT IN (5)
+                AND    c.id_estado IN (2, 4)
                 ORDER  BY c.fecha ASC, c.hora ASC
                 LIMIT  30";
         $stmt = $this->db->prepare($sql);
